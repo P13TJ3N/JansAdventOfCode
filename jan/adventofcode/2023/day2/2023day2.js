@@ -1,4 +1,5 @@
 let resultsList = [];
+let resultsList2 = [];
 const redLimit = 12, greenLimit = 13, blueLimit = 14;
 
 function calculateResult() {
@@ -49,15 +50,19 @@ function processInputText(inputText) {
                     break;
             };
         });
+        let powerSet =  maxRed * maxGreen * maxBlue;
         if(maxRed <= redLimit && maxGreen <= greenLimit && maxBlue <= blueLimit){gameIsPossible = true};
         if(gameIsPossible){resultsList.push(parseInt(gameId));};
+        resultsList2.push(parseInt(powerSet)); 
     });
 }
 
 function displayResults() {
     let resultsListSum = arrSum(resultsList);
+    let resultsListSum2 = arrSum(resultsList2);
     console.log(`De som van de mogelijke spellen is:${resultsListSum}`);
+    console.log(`De som van de powersets is ${resultsListSum2} \n dit bestaat uit:${resultsList2}`);
     //stuur info naar HTML document output
     var outputElement = document.getElementById("outputText");
-    outputElement.textContent = `De som van de mogelijke spellen is:${resultsListSum}`;
+    outputElement.textContent = `De som van de mogelijke spellen is:${resultsListSum} \n\n De som van de minimale kwadraatsets spellen is:${resultsListSum2} \n`;
 }
