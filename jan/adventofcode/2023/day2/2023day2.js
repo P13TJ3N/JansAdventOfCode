@@ -18,14 +18,6 @@ function arrSum(arr) {
     }, 0);
 }
 
-function reverseString(str) {
-    var newString = "";
-    for (var i = str.length - 1; i >= 0; i--) {
-        newString += str[i];
-    }
-    return newString;
-}
-
 function processInputText(inputText) {
     var lines = inputText.replace(/;/g,",").split('\n'); //replacing all semicolons with commas to split lines by commas
 
