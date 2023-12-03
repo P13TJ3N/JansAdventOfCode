@@ -63,7 +63,7 @@ function displayResults() {
     let calibrationNumberSum = arrSum(calibrationNumberList);
     let calibrationNumberWordSum = arrSum(calibrationNumberWordList);
     console.log(`The sum of calibration numbers is:${calibrationNumberSum} \n made fromt his list of trebuchet calibration numbers are: ${calibrationNumberList}`);
-    console.log(`The sum of calibration numbers is:${calibrationNumberWordSum} \n made fromt his list of trebuchet calibration numbers are: ${calibrationNumberWordList}`);
+    console.log(`The sum of calibration numbers including words is:${calibrationNumberWordSum} \n made fromt his list of trebuchet calibration numbers are: ${calibrationNumberWordList}`);
     // Display results in the output field
     var outputElement = document.getElementById("outputText");
     outputElement.textContent = `De som van de calibratie is:${calibrationNumberSum} \n Maar alsje de uitgeschreven getallen meeneemt dan is het ${calibrationNumberWordSum}`;
