@@ -26,12 +26,14 @@ function processInputText(inputText) {
     let dotLessText = inputText.replace('.','');
     let uniquteChars = dotLessText.replace(/[\n.a-zA-Z0-9]/g,'');
     let specialCharacters = [...new Set(uniquteChars)]
+    let tandwielen = [];
     console.log(`speciale karakters gevonden: ${specialCharacters}`);
     dot = '.';
     let startEndLine = dot.repeat(lineLength)
     lines.unshift(startEndLine);
     lines.push(startEndLine); //voeg nep eerste en laatste lijn toe om onnodige IF statements te voorkomen.
     lineNumber = 0;
+    
     for (let i = 0; i < arrayLength; i++) {
         let lastLine = i, currentLine = i+1, nextLine = i+2; 
         //pak 3 lijnen tegelijkertijd
@@ -77,20 +79,37 @@ function processInputText(inputText) {
                         console.log(specialCharacters.includes(lines[lastLine][b]));
                         console.log(lines[lastLine][b]);
                         if(specialCharacters.includes(lines[lastLine][b])){addSet = true};
+                        if(lines[lastLine][b] == '*'){
+                            if(tandwielen[lastLine,b] === undefined){tandwielen[lastLine,b] = [];}
+                            console.log(`tandwield gevonden op positie: ${lastLine},${b}`);
+                            tandwielen[lastLine,b].push(getallenSets[i]);
+                        };
                         
                         console.log(specialCharacters.includes(lines[currentLine][b]));
                         console.log(lines[currentLine][b]);
                         if(specialCharacters.includes(lines[currentLine][b])){addSet = true};
+                        if(lines[currentLine][b] == '*'){
+                            if(tandwielen[currentLine,b] === undefined){tandwielen[currentLine,b] = [];}
+                            console.log(`tandwield gevonden op positie: ${currentLine},${b}`);
+                            tandwielen[currentLine,b].push(getallenSets[i]);
+                        };
 
                         console.log(specialCharacters.includes(lines[nextLine][b]));
                         console.log(lines[nextLine][b]);
                         if(specialCharacters.includes(lines[nextLine][b])){addSet = true};
-                    };
+                        if(lines[currentLine][b] == '*'){
+                            if(tandwielen[nextLine,b] === undefined){tandwielen[nextLine,b] = [];}
+                            console.log(`tandwield gevonden op positie: ${nextLine},${b}`);
+                            tandwielen[nextLine,b].push(getallenSets[i]);
+                        };
+                };
                     if(addSet){resultsList.push(parseInt(getallenSets[i]));};
                 };
             };
         };
+        
       };
+      console.log(tandwielen);
 };
 
 
@@ -102,4 +121,17 @@ function displayResults() {
     //stuur info naar HTML document output
     var outputElement = document.getElementById("outputText");
     outputElement.textContent = `${tekst} : ${resultsListSum} \n ${tekst2} : ${resultsListSum2}`;
-}
+};
+
+
+
+
+// console.log(specialCharacters.includes(lines[nextLine][b]));
+// console.log(lines[nextLine][b]);
+// if(specialCharacters.includes(lines[nextLine][b])){addSet = true};
+// if(lines[nextLine][b] == '*'){
+//     console.log(tandwielen.indexOf([nextLine,b]));
+//     tandwielen[nextLine,b] = [];
+//     console.log(tandwielen[nextLine,b]);
+//     tandwielen[nextLine,b].push(getallenSets[i]);
+// };
