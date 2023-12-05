@@ -143,16 +143,3 @@ function displayResults() {
     var outputElement = document.getElementById("outputText");
     outputElement.textContent = `${tekst} : ${resultsListSum} \n ${tekst2} : ${resultsListSum2}`;
 };
-
-
-
-
-// console.log(specialCharacters.includes(lines[nextLine][b]));
-// console.log(lines[nextLine][b]);
-// if(specialCharacters.includes(lines[nextLine][b])){addSet = true};
-// if(lines[nextLine][b] == '*'){
-//     console.log(tandwielen.indexOf([nextLine,b]));
-//     tandwielen[nextLine,b] = [];
-//     console.log(tandwielen[nextLine,b]);
-//     tandwielen[nextLine,b].push(getallenSets[i]);
-// };
