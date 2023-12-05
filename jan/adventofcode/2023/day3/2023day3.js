@@ -19,6 +19,11 @@ function arrSum(arr) {
     }, 0);
 }
 
+function Empty2DArray(rows, cols) { 
+    return Array.from({ length: rows }, 
+        () => Array(cols).fill(null)); 
+}
+
 function processInputText(inputText) {
     var lines = inputText.split('\n');
     const lineLength = lines[0].length;
@@ -26,7 +31,9 @@ function processInputText(inputText) {
     let dotLessText = inputText.replace('.','');
     let uniquteChars = dotLessText.replace(/[\n.a-zA-Z0-9]/g,'');
     let specialCharacters = [...new Set(uniquteChars)]
-    let tandwielen = [];
+
+    let tandwielen = Empty2DArray(arrayLength,lineLength);
+
     console.log(`speciale karakters gevonden: ${specialCharacters}`);
     dot = '.';
     let startEndLine = dot.repeat(lineLength)
@@ -45,7 +52,8 @@ function processInputText(inputText) {
         console.log(`====== numberCheck ${i} ======`);
         numberCheck = lines[currentLine].replace(/\D/g,'');
         console.log(!(numberCheck == ''));
-        if(!(numberCheck == '')&&currentBlock.replace().length>0){//als de regel een getal heeft
+        // if(!(numberCheck == '')&&currentBlock.replace().length>0){//als de regel een getal heeft
+        if(currentBlock.replace().length>0){//als de regel een getal heeft
             let getallenSets = [];
             let getalSet = '';
             let fistposition = null;
@@ -76,31 +84,31 @@ function processInputText(inputText) {
                     let addSet = false;
 
                     for (let b = (getallenSetsPosities[i][0]-1); b < (getallenSetsPosities[i][1]+2); b++){
-                        console.log(specialCharacters.includes(lines[lastLine][b]));
-                        console.log(lines[lastLine][b]);
+                        console.log(`Positie: ${lastLine},${b} Karakter: ${lines[lastLine][b]} - ${specialCharacters.includes(lines[lastLine][b])}`);
                         if(specialCharacters.includes(lines[lastLine][b])){addSet = true};
                         if(lines[lastLine][b] == '*'){
-                            if(tandwielen[lastLine,b] === undefined){tandwielen[lastLine,b] = [];}
                             console.log(`tandwield gevonden op positie: ${lastLine},${b}`);
-                            tandwielen[lastLine,b].push(getallenSets[i]);
-                        };
-                        
-                        console.log(specialCharacters.includes(lines[currentLine][b]));
-                        console.log(lines[currentLine][b]);
-                        if(specialCharacters.includes(lines[currentLine][b])){addSet = true};
-                        if(lines[currentLine][b] == '*'){
-                            if(tandwielen[currentLine,b] === undefined){tandwielen[currentLine,b] = [];}
-                            console.log(`tandwield gevonden op positie: ${currentLine},${b}`);
-                            tandwielen[currentLine,b].push(getallenSets[i]);
+                            if(tandwielen[lastLine][b] === null){tandwielen[lastLine][b] = getallenSets[i]; console.log('eerste toevoeging aan positie')}
+                            else{tandwielen[lastLine][b] += ("," + getallenSets[i]);}
+                            console.log(JSON.stringify(tandwielen));
                         };
 
-                        console.log(specialCharacters.includes(lines[nextLine][b]));
-                        console.log(lines[nextLine][b]);
-                        if(specialCharacters.includes(lines[nextLine][b])){addSet = true};
+                        console.log(`Positie: ${currentLine},${b} Karakter: ${lines[currentLine][b]} - ${specialCharacters.includes(lines[currentLine][b])}`);
+                        if(specialCharacters.includes(lines[currentLine][b])){addSet = true};
                         if(lines[currentLine][b] == '*'){
-                            if(tandwielen[nextLine,b] === undefined){tandwielen[nextLine,b] = [];}
+                            console.log(`tandwield gevonden op positie: ${currentLine},${b}`);
+                            if(tandwielen[currentLine][b] === null){tandwielen[currentLine][b] = getallenSets[i]; console.log('eerste toevoeging aan positie')}
+                            else{tandwielen[currentLine][b] += ("," + getallenSets[i]);}
+                            console.log(JSON.stringify(tandwielen));
+                        };
+
+                        console.log(`Positie: ${nextLine},${b} Karakter: ${lines[nextLine][b]} - ${specialCharacters.includes(lines[nextLine][b])}`);
+                        if(specialCharacters.includes(lines[nextLine][b])){addSet = true};
+                        if(lines[nextLine][b] == '*'){
                             console.log(`tandwield gevonden op positie: ${nextLine},${b}`);
-                            tandwielen[nextLine,b].push(getallenSets[i]);
+                            if(tandwielen[nextLine][b] === null){tandwielen[nextLine][b] = getallenSets[i]; console.log('eerste toevoeging aan positie')}
+                            else{tandwielen[nextLine][b] += ("," + getallenSets[i]);}
+                            console.log(JSON.stringify(tandwielen));
                         };
                 };
                     if(addSet){resultsList.push(parseInt(getallenSets[i]));};
@@ -109,7 +117,20 @@ function processInputText(inputText) {
         };
         
       };
-      console.log(tandwielen);
+      tandwielen = tandwielen.flat().filter(elements => {
+        return (elements != null && elements !== undefined && elements !== "");
+       });
+       console.log(tandwielen);
+       tandwielen.forEach(wiel => {
+        console.log(wiel);
+        if(typeof wiel === 'string'){
+            let onderdelen = wiel.split(',');
+            if(onderdelen.length === 2){
+                let somVanOnderdelen = parseInt(onderdelen[0])*parseInt(onderdelen[1]);
+                resultsList2.push(parseInt(somVanOnderdelen));
+            };
+        };
+       });
 };
 
 
