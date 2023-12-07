@@ -133,7 +133,6 @@ function processInputText(inputText) {
        });
 };
 
-
 function displayResults() {
     let resultsListSum = arrSum(resultsList);
     let resultsListSum2 = arrSum(resultsList2);
