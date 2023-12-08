@@ -33,13 +33,16 @@ function processInputText(inputText) {
         seedInt = parseInt(seed);
         console.log(`zaad ${seedInt} wordt nu verwerkt`);
         seedPathCheck[seedDebugCount] = [];
+        seedPathCheck[seedDebugCount].push(parseInt(seed));
 
         seedMap.forEach(function(map) {
             var lines = map.split('\n');
             let currentMap = lines.shift();
             console.log(`processing ${currentMap}`);
-            lines.forEach(function(line) {
-                mapItem = line.split(" ");
+
+            for (let i = 0; i < lines.length; i++) {
+            // lines.forEach(function(line) {
+                mapItem = lines[i].split(" ");
                 console.log(mapItem);
                 let destinationRangeStart = parseInt(mapItem[0]);
                 let range  = parseInt(mapItem[2]);
@@ -50,8 +53,10 @@ function processInputText(inputText) {
                     debug = (seedInt);
                     seedInt += afwijking;
                     console.log(`${debug} is tussen ${sourceRangeStart} en ${sourceRangeEnd} en wordt nu ${seedInt}`);
+                    break;
                 };
-            });
+            // });
+        }
             seedPathCheck[seedDebugCount].push(seedInt);
         });
         endSeedList.push(seedInt);
