@@ -41,7 +41,6 @@ function processInputText(inputText) {
             console.log(`processing ${currentMap}`);
 
             for (let i = 0; i < lines.length; i++) {
-            // lines.forEach(function(line) {
                 mapItem = lines[i].split(" ");
                 console.log(mapItem);
                 let destinationRangeStart = parseInt(mapItem[0]);
@@ -55,7 +54,6 @@ function processInputText(inputText) {
                     console.log(`${debug} is tussen ${sourceRangeStart} en ${sourceRangeEnd} en wordt nu ${seedInt}`);
                     break;
                 };
-            // });
         }
             seedPathCheck[seedDebugCount].push(seedInt);
         });
