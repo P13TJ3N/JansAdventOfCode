@@ -67,6 +67,6 @@
         <p id="outputText"></p>
     </div>
 
-    <script src="2023day5.js"></script>
+    <script src="2023day5p2.js"></script>
 </body>
 </html>

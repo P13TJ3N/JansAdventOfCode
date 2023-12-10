@@ -1,7 +1,5 @@
 let resultsList = [];
-let resultsList2 = [];
 const tekst = "De kleinste grondlocatie is";
-const tekst2 = "";
 
 function calculateResult() {
     // haal Input waarden op
@@ -70,10 +68,9 @@ function processInputText(inputText) {
 
 function displayResults() {
     let resultsListSum = arrSum(resultsList);
-    let resultsListSum2 = arrSum(resultsList2);
     console.log(`${tekst} : ${resultsListSum}`);
     console.log(`${tekst2} : ${resultsListSum2}`);
     //stuur info naar HTML document output
     var outputElement = document.getElementById("outputText");
-    outputElement.textContent = `${tekst} : ${resultsListSum} \n ${tekst2} : Er zijn ${resultsListSum2} kaarten`;
+    outputElement.textContent = `${tekst} : ${resultsListSum}`
 };
