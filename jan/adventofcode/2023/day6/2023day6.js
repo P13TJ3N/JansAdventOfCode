@@ -1,6 +1,6 @@
 let resultsList = [];
 let resultsList2 = [];
-const tekst = "vermenigvuldiging van antwoord";
+const tekst = "vermenigvuldiging van antwoorden";
 const tekst2 = "totale antwoord";
 
 function calculateResult() {
@@ -25,6 +25,16 @@ function arrMultiply(arr) {
     }, 0);
 }
 
+function abcFormule(time,distance){
+    let discriminant = (time**2)-(4*distance);
+    let min = (time-Math.sqrt(discriminant))/2
+    if(min === Math.ceil(min)){min +=1;}else{min = Math.ceil(min);};
+    let max = (time+Math.sqrt(discriminant))/2
+    if(max === Math.ceil(max)){max -=1;}else{max = Math.ceil(max);};
+    let aantalOplossingen = max-min;
+    return(aantalOplossingen);
+}
+
 function processInputText(inputText) {
     let input = [];
     let output = [];
@@ -43,27 +53,15 @@ function processInputText(inputText) {
     for (let i = 0; i < input[0].length; i++) {
         let time = parseInt(input[0][i]);
         let distance = parseInt(input[1][i]);
-        let discriminant = (time**2)-(4*distance);
-        let min = (time-Math.sqrt(discriminant))/2
-        if(min === Math.ceil(min)){min +=1;}else{min = Math.ceil(min);};
-        let max = (time+Math.sqrt(discriminant))/2
-        if(max === Math.ceil(max)){max -=1;}else{max = Math.ceil(max);};
-        let aantalOplossingen = max-min;
-        output.push(aantalOplossingen);
+        output.push(abcFormule(time,distance));
     };
     let multiplication = output.reduce((a, b)=> a*b, 1)
     resultsList.push(multiplication);
-
+    
     //oplossing2
     let time = parseInt(arrSum(input[0]));
     let distance = parseInt(arrSum(input[1]));
-    let discriminant = (time**2)-(4*distance);
-    let min = (time-Math.sqrt(discriminant))/2
-    if(min === Math.ceil(min)){min +=1;}else{min = Math.ceil(min);};
-    let max = (time+Math.sqrt(discriminant))/2
-    if(max === Math.ceil(max)){max -=1;}else{max = Math.ceil(max);};
-    let aantalOplossingen = max-min;
-    resultsList2.push(aantalOplossingen);
+    resultsList2.push(abcFormule(time,distance));
 }
 
 function displayResults() {
