@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABC formule</title>
+    <title>know when to hold them</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -67,6 +67,6 @@
         <p id="outputText"></p>
     </div>
 
-    <script src="2023day6.js"></script>
+    <script src="2023day7.js"></script>
 </body>
 </html>

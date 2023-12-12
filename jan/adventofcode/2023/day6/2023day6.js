@@ -19,12 +19,6 @@ function arrSum(arr) {
     }, 0);
 }
 
-function arrMultiply(arr) { 
-    return arr.reduce(function(a, b) {
-        return a * b;
-    }, 0);
-}
-
 function abcFormule(time,distance){
     let discriminant = (time**2)-(4*distance);
     let min = (time-Math.sqrt(discriminant))/2
