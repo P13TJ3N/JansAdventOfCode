@@ -1,5 +1,6 @@
 let resultsList = [];
 const tekst = "De kleinste grondlocatie is";
+const tekst2 = "";
 
 function calculateResult() {
     // haal Input waarden op
