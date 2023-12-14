@@ -1,7 +1,7 @@
 let resultsList = [];
 let resultsList2 = [];
 const tekst = "Stappen tot het einde";
-const tekst2 = "";
+const tekst2 = "Spookstappen tot het einde";
 
 function calculateResult() {
     // haal Input waarden op
@@ -25,11 +25,52 @@ function getOccurrence(array, value) { //https://stackoverflow.com/questions/373
     return count;
 }
 
+function primeFactors(n) { //https://stackoverflow.com/questions/39899072/how-can-i-find-the-prime-factors-of-an-integer-in-javascript
+    const factors = [];
+    let divisor = 2;
+  
+    while (n >= 2) {
+      if (n % divisor == 0) {
+        factors.push(divisor);
+        n = n / divisor;
+      } else {
+        divisor++;
+      }
+    }
+    return factors;
+  }
+  
+
+function getSteps(locatieNaam, instructies, locaties){
+    let locatie = locaties.get(locatieNaam);
+    let steps = 0;
+    let aantalEindesGevonden = [];
+    while (aantalEindesGevonden.length < 1)  {
+        for (let index = 0; index < instructies.length; index++) {
+            const instructie = instructies[index];
+            steps++;
+            if(instructie === `L`){
+                locatieNaam = locatie[0];
+                locatie = locaties.get(locatieNaam);
+            }else{
+                locatieNaam = locatie[1];
+                locatie = locaties.get(locatieNaam);
+            };
+            if(locatieNaam.charAt(2) === 'Z'){console.log(locatieNaam);aantalEindesGevonden.push(steps); console.log(`We zijn er na maar ${steps} stappen! `)};
+        };
+    };
+    return steps;
+};
+
 function processInputText(inputText) {
-    let locaties = [];
+    let locaties = new Map();
     let stappen = 0;
+    let spookStappen = 0;
     let zzzFound = false;
     let huidigeLocatie = "AAA";
+    let huidigeLocaties = [];
+    let locatieStatussen = [];
+    let eindGetallen = [];
     var lines = inputText.replace(/ /g, '').split('\n');
     const instructies = lines.shift().split('');;
     lines.shift(); //remove empty line
@@ -37,34 +78,57 @@ function processInputText(inputText) {
 
     lines.forEach(function(line) {
         const deel =  line.replace(/[{()}]/g, '').split('=');
-        const id = deel[0];
         const linksRechts =  deel[1].split(',');
-        locaties.push({'id': id, 'linksRechts' : linksRechts});
+        locaties.set(deel[0], linksRechts);
+        if(deel[0].charAt(2) === 'A'){
+            console.log(`startdeel gevonden ${deel[0]}`);
+            huidigeLocaties.push(deel[0]);
+            locatieStatussen.push(0);
+        };
     });
 
     while (zzzFound === false) {
         for (let index = 0; index < instructies.length; index++) {
             stappen++;
-            let locatie = locaties.find(o => o.id === huidigeLocatie);
-            const vorigeLocatie = huidigeLocatie;
+            let locatie = locaties.get(huidigeLocatie);
             const instructie = instructies[index];
-            console.log(instructie);
             if(instructie === `L`){
-                huidigeLocatie = locatie.linksRechts[0];
-                console.log(`stap: ${stappen}: we slaan links af van ${vorigeLocatie} naar ${huidigeLocatie}`);
+                huidigeLocatie = locatie[0];
             }else{
-                huidigeLocatie = locatie.linksRechts[1];
-                console.log(`stap: ${stappen}: we slaan rechts af van ${vorigeLocatie} naar ${huidigeLocatie}`);
+                huidigeLocatie = locatie[1];
             };
             if(huidigeLocatie === 'ZZZ'){
                 zzzFound = true;
                 console.log(`We zijn er na maar ${stappen} stappen! `);
-                break
+                break;
             };
         }
     };
     resultsList.push(stappen);
-    // resultsList2.push();
+
+    for (let locatieNummer = 0; locatieNummer < huidigeLocaties.length; locatieNummer++) {
+        eindGetallen.push(getSteps(huidigeLocaties[locatieNummer],instructies,locaties));
+    };
+
+    let priemenLijst = [];
+    console.log(eindGetallen);
+    eindGetallen.sort((a, b) => a - b); // groot naar klein
+    eindGetallen.forEach(getal => {
+        const priemen = primeFactors(getal);
+        priemenLijst.push(priemen[0]);
+        priemenLijst.push(priemen[1]);
+    });
+    console.log(priemenLijst);
+    const priemenSet = new Set(priemenLijst);
+    console.log(priemenSet);    
+    const eindPriemen = Array.from(priemenSet);
+    console.log(eindPriemen);
+    spookStappen = eindPriemen.shift();
+    eindPriemen.forEach(priem => {
+        spookStappen = spookStappen * priem;
+    });
+    resultsList2.push(spookStappen);
+
 };
 
 function displayResults() {
