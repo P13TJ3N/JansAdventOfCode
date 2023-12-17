@@ -1,8 +1,8 @@
 let controleLijst = [];
 let resultsList = [];
 let resultsList2 = [];
-const tekst = "Stappen tot het einde";
-const tekst2 = "Spookstappen tot het einde";
+const tekst = "som van extrapolatie";
+const tekst2 = "Som can omgedraaide extrapolatie";
 let opnameRij = 0;
 let verschillenLijst = [];
 
