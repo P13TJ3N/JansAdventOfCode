@@ -82,6 +82,7 @@ function processInputText(inputText) {
     const kaartLengte = lines.length;
     const kaartBreeddte = lines[0].length;
     let scoremap = Empty2DArray(kaartLengte,kaartBreeddte);
+    scoremap[yDiertje][xDiertje] = 1;
     var kaart = lines.join('<br>');
     renderKaart(kaart);
     console.log(`het diertje is op plek ${xDiertje}${xDiertje}`);
@@ -106,6 +107,7 @@ function processInputText(inputText) {
         else{console.log(`dit konijn heeft geen idee waar te starten :(`)};
         spookKonijnen[index] = [x,y];
         console.log(`konijn ${index} gaat naar ${spookRichtingen[index]}`);
+        scoremap[y][x] = 1;
     };
 
     //main loop
@@ -115,7 +117,6 @@ function processInputText(inputText) {
     while(langestAfstandGevonden === false){
         stappen++;
         for (let konijn = 0; konijn < spookKonijnen.length; konijn++) {
-        // for (let konijn = 0; konijn < 1; konijn++) {
             let x = spookKonijnen[konijn][0];
             let y = spookKonijnen[konijn][1];
             console.log(spookRichtingen[konijn]);
@@ -133,10 +134,10 @@ function processInputText(inputText) {
     };
     maxScore = 0;
     cleanMap = scoremap;
-    for (let index = 0; index < scoremap.length; index++) {
+    for (let index = 0; index < lines.length; index++) {
         const max = Math.max(...scoremap[index]);
         if(max>maxScore)(maxScore=max)
-        for (let score = 0; score < cleanMap.length; score++) {
+        for (let score = 0; score < cleanMap[index].length; score++) {
             if(cleanMap[index][score] > 0){cleanMap[index][score] = lines[index][score]};
         }
         cleanMap[index] = cleanMap[index].join("");
@@ -147,7 +148,6 @@ function processInputText(inputText) {
     
     // part 2
     renderKaart(cleanMap);
-
 };
 
 function displayResults() {
