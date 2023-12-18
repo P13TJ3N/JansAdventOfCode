@@ -109,9 +109,6 @@ function navigatie(x,y,lines,richting){
     const onder  = lines[y+1][x];
     const links  = lines[y][x-1];
     const rechts = lines[y][x+1];
-    // console.log(`${lines[y-1][x-1]}${lines[y-1][x]}${lines[y-1][x+1]}`);
-    // console.log(`${lines[y][x-1]}${lines[y][x]}${lines[y][x+1]}`);
-    // console.log(`${lines[y+1][x-1]}${lines[y+1][x]}${lines[y+1][x+1]}`);
     if(optiesBoven.includes(boven)&&!(richting === "⬇")&&!(['═','╔','╗'].includes (huidigePijp))){opties += "⬆"};
     if(optiesOnder.includes(onder)&&!(richting === "⬆")&&!(['═','╝','╚'].includes(huidigePijp))){opties += "⬇"};
     if(optiesLinks.includes(links)&&!(richting === "➡")&&!(['║','╔','╚'].includes(huidigePijp))){opties += "⬅"};
@@ -130,10 +127,8 @@ function vul(x,y,lines){
     //check rechts
     if(x < lines[0].length){if(lines[y][x+1] === '░░'||lines[y][x-1] === 'KH'){megaMap[y][x+1] = '▒▒'; opties.push([y,x+1]);};};
     if(opties.length>0){
-        console.log(`we hebben de volgende pixels om nu te verwerken: ${opties}`);
         return(opties);
     }else{
-        console.log(`we kunnen nergens heen vanaf hier`);
         return(null);
     };
 };
@@ -185,22 +180,19 @@ function processInputText(inputText) {
     else if(konijnen.includes("⬅")&&konijnen.includes("⬇")){lines[yDiertje][xDiertje] = '╗';console.log(`knijn is ${lines[yDiertje][xDiertje]}`);}
     lines[yDiertje] = lines[yDiertje].join("");
     let spookRichtingen = konijnen.split('');
-    // console.log(` de spookrichtingen zijn ${spookRichtingen}`);
 
     // release the ghost bunnies! >:D
     console.log(`=== release the ghost bunnies! >:D === `);
     let spookKonijnen = [];
     for (let index = 0; index < spookRichtingen.length; index++) {
-        // console.log(`konijn ${index} kijkt nu wat die moet doen`)
         let x = xDiertje;
         let y = yDiertje;
         if(spookRichtingen[index] === "⬆"){y--}
         else if(spookRichtingen[index] === "⬇"){y++}
         else if(spookRichtingen[index] === "⬅"){x--}
         else if(spookRichtingen[index] === "➡"){x++}
-        // else{console.log(`dit konijn heeft geen idee waar te starten :(`)};
         spookKonijnen[index] = [x,y];
-        // console.log(`konijn ${index} gaat naar ${spookRichtingen[index]}`);
+
         scoremap[y][x] = 1;
     };
 
@@ -213,8 +205,6 @@ function processInputText(inputText) {
         for (let konijn = 0; konijn < spookKonijnen.length; konijn++) {
             let x = spookKonijnen[konijn][0];
             let y = spookKonijnen[konijn][1];
-            // console.log(spookRichtingen[konijn]);
-            // console.log(`konijn ${konijn} ging naar ${spookRichtingen[konijn]} en staat nu op ${x},${y} `);
             spookRichtingen[konijn] = navigatie(x,y,lines,spookRichtingen[konijn]);
             if(spookRichtingen[konijn] === "⬆"){y--}
             else if(spookRichtingen[konijn] === "⬇"){y++}
@@ -254,27 +244,15 @@ function processInputText(inputText) {
             const pixel = pixels.shift();
             const x = pixel[1];
             const y = pixel[0];
-            console.log(`x is ${x}`);
-            console.log(`y is ${y}`);
             const newpixel = vul(x,y,megaMap);
-            console.log(`gevonden pixels`);
-            console.log(newpixel);
             if(newpixel){
                 for (let index = 0; index < newpixel.length; index++) {
-                    console.log(pixels.length);
-                    console.log(`we voegen deze toe aan de lijst: ${newpixel[index]}`);
                     pixels.push(newpixel[index]);
                 };
-                console.log(`toegevoegd aan bestaande lijst`);
-                console.log(pixels);
             };
         };
-        if(pixels.length === 0){console.log(`geen pixels meer om te verwerken`); break;};
+        if(pixels.length === 0){break;};
     };
-    console.log(`map2 wordt gemaakt`);
-    renderMap = cleanMap.join('<br>');
-    renderKaart(renderMap);
-    console.log(scoremap);
 
     let maxScore2 = 0;
     for (let rij = 0; rij < megaMap.length; rij++) {
