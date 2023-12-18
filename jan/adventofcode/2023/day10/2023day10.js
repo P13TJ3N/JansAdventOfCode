@@ -2,13 +2,78 @@
 let resultsList = []; //vind de verste locatie die het diertje kan lopen in de loep van de start.
 let resultsList2 = [];
 const tekst = "Verste afstand van het konijn is";
-const tekst2 = "";
+const tekst2 = "De grootte van het konijnenhol is";
+let megaMap = [];
 
 const optiesBoven =  [`║`,`╗`,`╔`];
 const optiesOnder =  [`║`,`╝`,`╚`];
 const optiesLinks =  [`═`,`╔`,`╚`];
 const optiesRechts = [`═`,`╗`,`╝`];
 let richting = [];
+
+//║
+const upDown = [
+    ['░░','██','░░'],
+    ['░░','██','░░'],
+    ['░░','██','░░']]
+//═
+const leftRight = [
+    ['░░','░░','░░'],
+    ['██','██','██'],
+    ['░░','░░','░░']]
+//╗
+const downLeft = [
+    ['░░','░░','░░'],
+    ['██','██','░░'],
+    ['░░','██','░░']]
+//╔
+const downRight = [
+    ['░░','░░','░░'],
+    ['░░','██','██'],
+    ['░░','██','░░']]
+//╚
+const upRight = [
+    ['░░','██','░░'],
+    ['░░','██','██'],
+    ['░░','░░','░░']]
+//╝
+const upLeft = [
+    ['░░','██','░░'],
+    ['██','██','░░'],
+    ['░░','░░','░░']]
+//0
+const emptySpace = [
+    ['░░','░░','░░'],
+    ['░░','KH','░░'],
+    ['░░','░░','░░']]
+
+function superSizeMe(lines){
+    let megaMap = [];
+    let megalLine = 0;
+    
+    for (let row = 0; row < lines.length; row++) {
+        megaMap[megalLine]   = [];
+        megaMap[megalLine+1] = [];
+        megaMap[megalLine+2] = [];
+        for (let col = 0; col < lines[0].length; col++) {
+            let megaBlock =[];
+            const element = lines[row][col];
+                 if(element==="║"){megaBlock = upDown;}
+            else if(element==="═"){megaBlock = leftRight;}
+            else if(element==="╗"){megaBlock = downLeft;}
+            else if(element==="╔"){megaBlock = downRight;}
+            else if(element==="╚"){megaBlock = upRight;}
+            else if(element==="╝"){megaBlock = upLeft;}
+                              else{megaBlock = emptySpace;
+            };
+            megaMap[megalLine].push(...megaBlock[0]);
+            megaMap[megalLine+1].push(...megaBlock[1]);
+            megaMap[megalLine+2].push(...megaBlock[2]);
+        };
+        megalLine += 3;
+    };
+    return megaMap;
+};
 
 function calculateResult() {
     // haal Input waarden op
@@ -44,15 +109,33 @@ function navigatie(x,y,lines,richting){
     const onder  = lines[y+1][x];
     const links  = lines[y][x-1];
     const rechts = lines[y][x+1];
-    console.log(`${lines[y-1][x-1]}${lines[y-1][x]}${lines[y-1][x+1]}`);
-    console.log(`${lines[y][x-1]}${lines[y][x]}${lines[y][x+1]}`);
-    console.log(`${lines[y+1][x-1]}${lines[y+1][x]}${lines[y+1][x+1]}`);
-
+    // console.log(`${lines[y-1][x-1]}${lines[y-1][x]}${lines[y-1][x+1]}`);
+    // console.log(`${lines[y][x-1]}${lines[y][x]}${lines[y][x+1]}`);
+    // console.log(`${lines[y+1][x-1]}${lines[y+1][x]}${lines[y+1][x+1]}`);
     if(optiesBoven.includes(boven)&&!(richting === "⬇")&&!(['═','╔','╗'].includes (huidigePijp))){opties += "⬆"};
     if(optiesOnder.includes(onder)&&!(richting === "⬆")&&!(['═','╝','╚'].includes(huidigePijp))){opties += "⬇"};
     if(optiesLinks.includes(links)&&!(richting === "➡")&&!(['║','╔','╚'].includes(huidigePijp))){opties += "⬅"};
     if(optiesRechts.includes(rechts)&&!(richting === "⬅")&&!(['║','╝','╗'].includes(huidigePijp))){opties += "➡"};
     return(opties);
+};
+
+function vul(x,y,lines){
+    let opties = [];
+    //check boven
+    if(y > 0){if(lines[y-1][x] === '░░'||lines[y-1][x] === 'KH'){megaMap[y-1][x] = '▒▒'; opties.push([y-1,x]);};};
+    //check onder
+    if(y < lines.length-1){if(lines[y+1][x] === '░░'||lines[y][x-1] === 'KH'){megaMap[y+1][x] = '▒▒'; opties.push([y+1,x]);};};
+    //check links
+    if(x > 0){if(lines[y][x-1] === '░░'|lines[y][x-1] === 'KH'){megaMap[y][x-1] = '▒▒'; opties.push([y,x-1]);};};
+    //check rechts
+    if(x < lines[0].length){if(lines[y][x+1] === '░░'||lines[y][x-1] === 'KH'){megaMap[y][x+1] = '▒▒'; opties.push([y,x+1]);};};
+    if(opties.length>0){
+        console.log(`we hebben de volgende pixels om nu te verwerken: ${opties}`);
+        return(opties);
+    }else{
+        console.log(`we kunnen nergens heen vanaf hier`);
+        return(null);
+    };
 };
 
 function processInputText(inputText) {
@@ -81,32 +164,43 @@ function processInputText(inputText) {
     }
     const kaartLengte = lines.length;
     const kaartBreeddte = lines[0].length;
+
     let scoremap = Empty2DArray(kaartLengte,kaartBreeddte);
     scoremap[yDiertje][xDiertje] = 1;
     var kaart = lines.join('<br>');
     renderKaart(kaart);
     console.log(`het diertje is op plek ${xDiertje}${xDiertje}`);
-    
+
     let konijnen = navigatie(xDiertje,yDiertje,lines,"start");
     console.log(konijnen);
     console.log(konijnen.length);
+    console.log(lines[yDiertje]);
+    lines[yDiertje] = lines[yDiertje].split("");
+    console.log(lines[yDiertje]);
+         if(konijnen.includes("⬇")&&konijnen.includes("⬆")){lines[yDiertje][xDiertje] = '║';console.log(`knijn is ${lines[yDiertje][xDiertje]}`);}
+    else if(konijnen.includes("⬅")&&konijnen.includes("➡")){lines[yDiertje][xDiertje] = '═';console.log(`knijn is ${lines[yDiertje][xDiertje]}`);}
+    else if(konijnen.includes("⬅")&&konijnen.includes("⬆")){lines[yDiertje][xDiertje] = '╝';console.log(`knijn is ${lines[yDiertje][xDiertje]}`);}
+    else if(konijnen.includes("⬆")&&konijnen.includes("➡")){lines[yDiertje][xDiertje] = '╚';console.log(`knijn is ${lines[yDiertje][xDiertje]}`);}
+    else if(konijnen.includes("⬇")&&konijnen.includes("➡")){lines[yDiertje][xDiertje] = '╔';console.log(`knijn is ${lines[yDiertje][xDiertje]}`);}
+    else if(konijnen.includes("⬅")&&konijnen.includes("⬇")){lines[yDiertje][xDiertje] = '╗';console.log(`knijn is ${lines[yDiertje][xDiertje]}`);}
+    lines[yDiertje] = lines[yDiertje].join("");
     let spookRichtingen = konijnen.split('');
-    console.log(` de spookrichtingen zijn ${spookRichtingen}`);
+    // console.log(` de spookrichtingen zijn ${spookRichtingen}`);
 
     // release the ghost bunnies! >:D
     console.log(`=== release the ghost bunnies! >:D === `);
     let spookKonijnen = [];
     for (let index = 0; index < spookRichtingen.length; index++) {
-        console.log(`konijn ${index} kijkt nu wat die moet doen`)
+        // console.log(`konijn ${index} kijkt nu wat die moet doen`)
         let x = xDiertje;
         let y = yDiertje;
         if(spookRichtingen[index] === "⬆"){y--}
         else if(spookRichtingen[index] === "⬇"){y++}
         else if(spookRichtingen[index] === "⬅"){x--}
         else if(spookRichtingen[index] === "➡"){x++}
-        else{console.log(`dit konijn heeft geen idee waar te starten :(`)};
+        // else{console.log(`dit konijn heeft geen idee waar te starten :(`)};
         spookKonijnen[index] = [x,y];
-        console.log(`konijn ${index} gaat naar ${spookRichtingen[index]}`);
+        // console.log(`konijn ${index} gaat naar ${spookRichtingen[index]}`);
         scoremap[y][x] = 1;
     };
 
@@ -119,8 +213,8 @@ function processInputText(inputText) {
         for (let konijn = 0; konijn < spookKonijnen.length; konijn++) {
             let x = spookKonijnen[konijn][0];
             let y = spookKonijnen[konijn][1];
-            console.log(spookRichtingen[konijn]);
-            console.log(`konijn ${konijn} ging naar ${spookRichtingen[konijn]} en staat nu op ${x},${y} `);
+            // console.log(spookRichtingen[konijn]);
+            // console.log(`konijn ${konijn} ging naar ${spookRichtingen[konijn]} en staat nu op ${x},${y} `);
             spookRichtingen[konijn] = navigatie(x,y,lines,spookRichtingen[konijn]);
             if(spookRichtingen[konijn] === "⬆"){y--}
             else if(spookRichtingen[konijn] === "⬇"){y++}
@@ -132,22 +226,72 @@ function processInputText(inputText) {
             scoremap[y][x] = stappen;
         };
     };
-    maxScore = 0;
-    cleanMap = scoremap;
+    let maxScore = 0;
+    let cleanMap = scoremap;
+    let renderMap = cleanMap;
     for (let index = 0; index < lines.length; index++) {
         const max = Math.max(...scoremap[index]);
         if(max>maxScore)(maxScore=max)
         for (let score = 0; score < cleanMap[index].length; score++) {
             if(cleanMap[index][score] > 0){cleanMap[index][score] = lines[index][score]};
         }
-        cleanMap[index] = cleanMap[index].join("");
     }
-    cleanMap = cleanMap.join('<br>');
-    console.log(scoremap);
     resultsList.push(maxScore);
-    
-    // part 2
-    renderKaart(cleanMap);
+
+    // part 2 -- https://en.wikipedia.org/wiki/Flood_fill
+
+    //SUPERSIZE DE MAP
+    console.log(`megaMap wordt gemaakt`);
+    megaMap = superSizeMe(cleanMap);
+
+    //paint fill van buiten naar binnen
+    megaMap[0][0] = '▒▒';
+    let pixels = []
+    pixels.push([0,0])
+    while(true){
+        console.log(megaMap);
+        for (let index = 0; index < pixels.length; index++) {
+            const pixel = pixels.shift();
+            const x = pixel[1];
+            const y = pixel[0];
+            console.log(`x is ${x}`);
+            console.log(`y is ${y}`);
+            const newpixel = vul(x,y,megaMap);
+            console.log(`gevonden pixels`);
+            console.log(newpixel);
+            if(newpixel){
+                for (let index = 0; index < newpixel.length; index++) {
+                    console.log(pixels.length);
+                    console.log(`we voegen deze toe aan de lijst: ${newpixel[index]}`);
+                    pixels.push(newpixel[index]);
+                };
+                console.log(`toegevoegd aan bestaande lijst`);
+                console.log(pixels);
+            };
+        };
+        if(pixels.length === 0){console.log(`geen pixels meer om te verwerken`); break;};
+    };
+    console.log(`map2 wordt gemaakt`);
+    renderMap = cleanMap.join('<br>');
+    renderKaart(renderMap);
+    console.log(scoremap);
+
+    let maxScore2 = 0;
+    for (let rij = 0; rij < megaMap.length; rij++) {
+        for (let col = 0; col < megaMap[0].length; col++) {
+            const cel = megaMap[rij][col];
+            if(cel === 'KH'){maxScore2++}; 
+        }
+    }
+    resultsList2.push(maxScore2);
+
+    //Render de map
+    for (let index = 0; index < megaMap.length; index++) {
+        megaMap[index] = megaMap[index].join("");
+    };
+    renderMap = megaMap.join('<br>');
+    renderKaart(renderMap);
+    console.log(megaMap);
 };
 
 function displayResults() {
