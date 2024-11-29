@@ -1,0 +1,152 @@
+let resultsList = []; //vind de verste locatie die het diertje kan lopen in de loep van de start.
+let resultsList2 = [];
+const tekst = "som van mogelijke opstellingen is";
+const tekst2 = "";
+let geiserLijst = [];
+
+function calculateResult() {
+    // haal Input waarden op
+    var inputElement = document.getElementById("inputTextArea");
+    var inputText = inputElement.value;
+    // verwerk input waarden
+    processInputText(inputText);
+    // geef resultaat terug aan webpagina en console.log
+    displayResults();
+}
+
+function arrSum(arr) { 
+    return arr.reduce(function(a, b) {
+        return a + b;
+    }, 0);
+}
+
+function checkMogenlijkheid(geiser,opnamenRij,opnamenPosities){
+    een = geiser;
+    nr = 0;
+    opnamenPosities.forEach(opname => {
+        let newArray = [];
+        for (let index = 0; index < parseInt(opnamenRij[nr]); index++) {newArray.push(opnamenRij[nr]);}
+        een.splice(opname[0],opnamenRij[nr],...newArray);
+        nr++;
+    });
+    return een
+};
+
+function gaDoorOptiesHeen(index,checkGeiser,opnamenRij,opnamenPosities,geiser){
+    let lijnLimiet = geiser.length-1;
+    let itemrechts = false;
+    if(index < opnamenRij.length){
+        for (let opname = 0; opname < opnamenRij.length; opname++) {
+            if(opname>=index){lijnLimiet-=opnamenRij[opname];lijnLimiet--}
+        };
+        itemrechts = true;
+        console.log(`Dit is niet de eerste opname`);
+    }else{
+        console.log(`Dit is de eerste opname`);
+    };
+    let start = opnamenPosities[index-1][0];
+    let eind = opnamenPosities[index-1][1];
+    console.log(`eind = ${eind} - lijnLimiet = ${lijnLimiet}`);
+    let kanNaarRechts = true;
+    let stappen = 0;
+    while (kanNaarRechts){
+        // console.log(eind);
+        // console.log(geiser.length);
+        if(eind === lijnLimiet){
+            // console.log(`kan niet meer naar rechts, we gaan naar de volgende`);
+            lijnLimiet = start-1;
+            kanNaarRechts = false;
+        }else{
+            // console.log(JSON.stringify(opnamenPosities[index-1]));
+            start++;
+            eind++;
+            stappen++;
+            opnamenPosities[index-1] = [start,eind];
+            checkGeiser =  checkMogenlijkheid([...geiser],opnamenRij,opnamenPosities);
+            if(!(checkGeiser.includes('#'))){mogenlijkheden++; geiserLijst.push(checkGeiser);};
+            console.log(checkGeiser);
+            // console.log(JSON.stringify(opnamenPosities[index-1]));
+            // console.log(JSON.stringify(opnamenPosities));
+            // console.log(opnamenRij);
+            // console.log(opnamenPosities);
+            let opnamenPositiesBackup =  [...opnamenPosities];
+            //check of er een item rechts van je is
+            if(itemrechts){
+                opnamenPosities[index][0] = opnamenPosities[index-1][0]+2;
+                opnamenPosities[index][1] = opnamenPosities[index-1][1]+2;
+                checkGeiser =  checkMogenlijkheid([...geiser],opnamenRij,opnamenPosities);
+                gaDoorOptiesHeen(index+1,checkGeiser,opnamenRij,opnamenPosities,geiser)
+            };
+            opnamenPosities = [...opnamenPositiesBackup];
+        };
+
+        if(stappen > 7){kanNaarRechts = false; console.log(`NOODREM NOOOODREM!!!`); break;}
+        
+    };
+}
+
+function processInputText(inputText) {
+    var lines = inputText.split('\n');
+    let geisers = [];
+    let opnames = []; 
+
+    for (let index = 0; index < lines.length; index++) {
+        lines[index] = lines[index].split(" ");
+        geisers.push(lines[index][0]);
+        opnames.push(lines[index][1]);
+    };
+
+    mogenlijkheden = 0;
+    const geiser = geisers[0].split("");
+    const opnamenRij = opnames[0].split(",");
+
+    //vind startposities
+    let opnamenPosities = []
+    let startpositie = 0;
+    for (let index = 0; index < opnamenRij.length; index++) {
+        const opname = parseInt(opnamenRij[index])-1;
+        opnamenPosities.push([startpositie,startpositie+opname]);
+        startpositie += opname+2;
+    };
+
+    console.log(geiser);
+    console.log(opnamenRij);
+    console.log(opnamenPosities);
+    let checkGeiser =  checkMogenlijkheid([...geiser],opnamenRij,opnamenPosities); // array spread omdat het anders geen copie maakt maar een referentie
+    if(!(checkGeiser.includes('#'))){mogenlijkheden++; geiserLijst.push(checkGeiser);};
+    console.log(JSON.stringify(checkGeiser));
+    console.log(JSON.stringify(geiser));
+
+    //loop door de andere mogelijke posities heen
+    for (let index = opnamenPosities.length; index > 0; index--) {//van achter naar voor
+        gaDoorOptiesHeen(index,checkGeiser,opnamenRij,opnamenPosities,geiser);
+    };
+    resultsList.push(mogenlijkheden);
+
+
+
+
+    //RENDER RESULT
+    let renderMap = [...geiserLijst];
+    for (let index = 0; index < geiserLijst.length; index++) {
+        renderMap[index] = renderMap[index].join("");
+        }
+        renderMap = renderMap.join("<br>");
+    renderKaart(renderMap);
+};
+
+function displayResults() {
+    let resultsListSum = arrSum(resultsList);
+    let resultsListSum2 = arrSum(resultsList2);
+    console.log(`${tekst} : ${resultsListSum}`);
+    console.log(`${tekst2} : ${resultsListSum2}`);
+    //stuur info naar HTML document output
+    var outputElement = document.getElementById("outputText");
+    outputElement.innerHTML = `${tekst} : ${resultsListSum} <br> ${tekst2} : ${resultsListSum2}`;
+};
+
+function renderKaart(kaart) {
+    //stuur info naar HTML document output
+    var outputElement = document.getElementById("renderContainer");
+    outputElement.innerHTML = `${kaart}`;
+};
