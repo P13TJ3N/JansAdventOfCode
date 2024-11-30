@@ -142,11 +142,11 @@ function displayResults() {
     console.log(`${tekst2} : ${resultsListSum2}`);
     //stuur info naar HTML document output
     var outputElement = document.getElementById("outputText");
-    outputElement.innerHTML = `${tekst} : ${resultsListSum} <br> ${tekst2} : ${resultsListSum2}`;
+    outputElement.value = `${tekst} : ${resultsListSum} <br> ${tekst2} : ${resultsListSum2}`;
 };
 
 function renderKaart(kaart) {
     //stuur info naar HTML document output
     var outputElement = document.getElementById("renderContainer");
-    outputElement.innerHTML = `${kaart}`;
+    outputElement.value = `${kaart}`;
 };

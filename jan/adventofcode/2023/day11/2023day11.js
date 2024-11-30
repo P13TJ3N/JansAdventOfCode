@@ -98,8 +98,8 @@ function displayResults() {
     console.log(`${tekst} : ${resultsListSum}`);
     console.log(`${tekst2} : ${resultsListSum2}`);
     //stuur info naar HTML document output
-    var outputElement = document.getElementById("outputText");
-    outputElement.innerHTML = `${tekst} : ${resultsListSum} <br> ${tekst2} : ${resultsListSum2}`;
+    var outputElement = document.getElementById("outputTextArea");
+    outputElement.value = `${tekst} : ${resultsListSum} \n${tekst2} : ${resultsListSum2}`;
 };
 
 function renderKaart(kaart) {

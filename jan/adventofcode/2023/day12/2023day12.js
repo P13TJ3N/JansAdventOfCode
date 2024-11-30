@@ -1,4 +1,5 @@
-let resultsList = []; //vind de verste locatie die het diertje kan lopen in de loep van de start.
+// This is where I got stuck in 2023, i never finished it
+let resultsList = [];
 let resultsList2 = [];
 const tekst = "som van mogelijke opstellingen is";
 const tekst2 = "";
@@ -55,12 +56,12 @@ function displayResults() {
     console.log(`${tekst} : ${resultsListSum}`);
     console.log(`${tekst2} : ${resultsListSum2}`);
     //stuur info naar HTML document output
-    var outputElement = document.getElementById("outputText");
-    outputElement.innerHTML = `${tekst} : ${resultsListSum} <br> ${tekst2} : ${resultsListSum2}`;
+    var outputElement = document.getElementById("outputTextArea");
+    outputElement.value = `${tekst} : ${resultsListSum} \n${tekst2} : ${resultsListSum2}`;
 };
 
 function renderKaart(kaart) {
     //stuur info naar HTML document output
     var outputElement = document.getElementById("renderContainer");
-    outputElement.innerHTML = `${kaart}`;
+    outputElement.value = `${kaart}`;
 };

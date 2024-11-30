@@ -69,7 +69,6 @@ function processInputText(inputText) {
 function displayResults() {
     let resultsListSum = arrSum(resultsList);
     console.log(`${tekst} : ${resultsListSum}`);
-    console.log(`${tekst2} : ${resultsListSum2}`);
     //stuur info naar HTML document output
     var outputElement = document.getElementById("outputText");
     outputElement.textContent = `${tekst} : ${resultsListSum}`

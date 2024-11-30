@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo basename(dirname(__FILE__)) ?></title>
+    <title>adventOfCode202101</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -90,6 +90,6 @@
         <textarea id="renderTextArea" readonly></textarea>
     </div>
 
-    <script src="2023day11.js"></script>
+    <script src="2021day1.js"></script>
 </body>
 </html>
