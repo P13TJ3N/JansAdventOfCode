@@ -35,4 +35,3 @@ rd.on('line', function(line) {
 rd.on('close', function() {
     console.log(`the total is ${totalScore}`);
 });
-

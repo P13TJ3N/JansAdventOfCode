@@ -1,3 +1,8 @@
+let resultsList = [];
+let resultsList2 = [];
+const tekst = "assignment pairs does one range fully contain the other";
+const tekst2 = "assignment pairs do the ranges overlap";
+
 let stack1 = ["H","R","B","D","Z","F","L","S"]
 let stack2 = ["T","B","M","Z","R"]
 let stack3 = ["Z","L","C","H","N","S"]
@@ -11,12 +16,18 @@ let stacks = [stack1, stack2, stack3, stack4, stack5, stack6, stack7, stack8, st
 
 let totalScore = "";
 
-//import txt file
-var fs = require('fs'),readline = require('readline');
-const { fileURLToPath } = require('url')
-var rd = readline.createInterface({input: fs.createReadStream('input.txt'),console: false});
-
+function calculateResult() {
+    var inputElement = document.getElementById("inputTextArea");// haal Input waarden op
+    var inputText = inputElement.value;
+    processInputText(inputText);// verwerk input waarden
+    displayResults();// geef resultaat terug aan webpagina en console.log
+}
 //functions
+function arrSum(arr) { 
+    return arr.reduce(function(a, b) {
+        return a + b;
+    }, 0);
+}
 function containterPrinter(stacks){
     //find longest stack
     let heighestStackHeight = 0;
@@ -50,20 +61,38 @@ function containerMover(amount,from,to){
 
 }
 
-//do something line by line of the imported file
-rd.on('line', function(line) {
-    containterPrinter(stacks);
-    console.log(line);
-    const input = line.match(/\b\d+\b/g);
-    containerMover(input[0],input[1]-1,input[2]-1);
-});
+function processInputText(inputText) {
+    var lines = inputText.split('\n')//split
 
-//do something after final line
-rd.on('close', function() {
+    //opdracht1
+    lines.forEach(function(line) {
+        containterPrinter(stacks);
+        console.log(line);
+        const input = line.match(/\b\d+\b/g);
+        containerMover(input[0],input[1]-1,input[2]-1); 
+    })
     containterPrinter(stacks);
     stacks.forEach(stack => {
         if(typeof stack[stack.length-1] == 'undefined'){totalScore = totalScore.concat(" ");}
         else {totalScore = totalScore.concat(stack[stack.length-1]);}
      });
     console.log(`the total is ${totalScore}`);
-});
+
+    //RENDER RESULT
+}
+
+function displayResults() {
+    let resultsListSum = arrSum(resultsList);
+    let resultsListSum2 = arrSum(resultsList2);
+    console.log(`${tekst} : ${resultsListSum}`);
+    console.log(`${tekst2} : ${resultsListSum2}`);
+    //stuur info naar HTML document output
+    var outputElement = document.getElementById("outputTextArea");
+    outputElement.value = `${tekst} : ${resultsListSum} \n${tekst2} : ${resultsListSum2}`;
+};
+
+function renderKaart(kaart) {
+    //stuur info naar HTML document render
+    var outputElement = document.getElementById("renderContainer");
+    outputElement.innerHTML = `${kaart}`;
+};
