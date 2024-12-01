@@ -90,6 +90,6 @@
         <textarea id="renderTextArea" readonly></textarea>
     </div>
 
-    <script src="2021day1.js"></script>
+    <script src="2024day1.js"></script>
 </body>
 </html>

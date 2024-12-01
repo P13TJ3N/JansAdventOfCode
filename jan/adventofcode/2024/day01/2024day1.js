@@ -1,7 +1,9 @@
 let resultsList = [];
 let resultsList2 = [];
-const tekst = "Aantal keer gezakt";
-const tekst2 = "Aantal keer diep gezakt";
+const tekst = "Het verschil tussen alle locaties van klein naar groot:";
+const tekst2 = "";
+listA = []
+listB = []
 
 function calculateResult() {
     var inputElement = document.getElementById("inputTextArea");// haal Input waarden op
@@ -9,40 +11,65 @@ function calculateResult() {
     processInputText(inputText);// verwerk input waarden
     displayResults();// geef resultaat terug aan webpagina en console.log
 }
-
+//functions
 function arrSum(arr) { 
     return arr.reduce(function(a, b) {
         return a + b;
     }, 0);
 }
 
+function arrTimes(arr) { 
+    return arr.reduce(function(a, b) {
+        return a * b;
+    }, 0);
+}
+
+function onlyUnique(value, index, array) {
+    return array.indexOf(value) === index;
+  }
+
+//per lijn
 function processInputText(inputText) {
-    resultsList  = 0; // reset na elke calculatie
-    resultsList2 = 0; 
-    var lines = inputText.split('\n').map(function(item) {return parseInt(item, 10);})//split en verander in getallen
+    var lines = inputText.split('\n')
 
     //opdracht1
-    for (let line = 1; line < lines.length; line++){
-        if (lines[line] > lines[line-1]){
-            resultsList++,
-            console.log(`${lines[line]} is groter dan ${lines[line-1]}, we zakken`)
-        }
+    for (let line = 0; line < lines.length; line++){
+        split = lines[line].split('   ');
+        listA.push(parseInt(split[0]));
+        listB.push(parseInt(split[1]));
     }
+
+    listA.sort(function(a, b){return a - b});
+    listB.sort(function(a, b){return a - b});
+
+    for (let i = 0; i < listA.length; i++){
+            let verschil = Math.abs(listA[i]-listB[i]);
+            resultsList.push(verschil)
+        }
+        
     //opdracht2
-    for (let line = 1; line+2 < lines.length; line++){
-        if ((lines[line]+lines[line+1]+lines[line+2]) > (lines[line-1]+lines[line]+lines[line+1])){
-            resultsList2++,
-            console.log(`${lines[line]+lines[line+1]+lines[line+2]} is groter dan ${lines[line-1]+lines[line]+lines[line+1]}, we zakken Diep`)
+    uniekeListA = [];
+    for (let i = 0; i < listA.length; i++) {
+        if (!uniekeListA.includes(listA[i])) {
+            uniekeListA.push(listA[i]);
         }
     }
+    
+    for (let a = 0; a < uniekeListA.length; a++){
+        let matchList = listB.filter(function(value){ return value === uniekeListA[a]});
+        if(matchList && matchList.length > 0){
+           resultsList2.push((matchList.length * uniekeListA[a]));
+        }
+    }
+
     //RENDER RESULT
     let kaart = ':D'
     renderKaart(kaart);
 }
 
 function displayResults() {
-    let resultsListSum = resultsList//arrSum(resultsList);
-    let resultsListSum2 = resultsList2//arrSum(resultsList2);
+    let resultsListSum = arrSum(resultsList);
+    let resultsListSum2 = arrSum(resultsList2);
     console.log(`${tekst} : ${resultsListSum}`);
     console.log(`${tekst2} : ${resultsListSum2}`);
     //stuur info naar HTML document output
