@@ -1,7 +1,7 @@
 let resultsList = [];
 let resultsList2 = [];
-const tekst = "Het verschil tussen alle locaties van klein naar groot:";
-const tekst2 = "";
+const tekst = "Het verschil tussen alle locaties van klein naar groot";
+const tekst2 = "De som van duplicaten in de kaart";
 listA = []
 listB = []
 
@@ -17,16 +17,6 @@ function arrSum(arr) {
         return a + b;
     }, 0);
 }
-
-function arrTimes(arr) { 
-    return arr.reduce(function(a, b) {
-        return a * b;
-    }, 0);
-}
-
-function onlyUnique(value, index, array) {
-    return array.indexOf(value) === index;
-  }
 
 //per lijn
 function processInputText(inputText) {
@@ -74,7 +64,7 @@ function displayResults() {
     console.log(`${tekst2} : ${resultsListSum2}`);
     //stuur info naar HTML document output
     var outputElement = document.getElementById("outputTextArea");
-    outputElement.value = `${tekst} : ${resultsListSum} \n${tekst2} : ${resultsListSum2}`;
+    outputElement.value = `${tekst} : ${resultsListSum} \n${tekst2}: ${resultsListSum2}`;
 };
 
 function renderKaart(kaart) {
