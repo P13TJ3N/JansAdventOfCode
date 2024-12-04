@@ -15,26 +15,30 @@ function arrSum(arr) {
         return a + b;
     }, 0);
 }
+function opdracht1{
+    return null
+}
+
 
 //per lijn
 function processInputText(inputText) {
     var lines = inputText.split('\n')
 
     //opdracht1
-    // for (let line = 0; line < lines.length; line++){
-    //     let levels = lines[line].split(' ').map(Number)
-    //     let omhoog = (levels[0] < levels[1])
+    for (let line = 0; line < lines.length; line++){
+        let levels = lines[line].split(' ').map(Number)
+        let omhoog = (levels[0] < levels[1])
         
-    //     let levelVerschillen = []
-    //     for (let level = 1; level < levels.length; level++){
-    //         let difference = levels[level]-levels[level-1];
-    //         levelVerschillen.push(difference)
-    //     }
-    //     let maxHoogte = Math.max(...levelVerschillen);
-    //     let maxDiepte = Math.min(...levelVerschillen);
-    //     if(omhoog && maxHoogte < 4 && maxDiepte > 0){resultsList.push(0)}
-    //     else if (maxHoogte < 0  && maxDiepte > -4){resultsList.push(0)}
-    // }
+        let levelVerschillen = []
+        for (let level = 1; level < levels.length; level++){
+            let difference = levels[level]-levels[level-1];
+            levelVerschillen.push(difference)
+        }
+        let maxHoogte = Math.max(...levelVerschillen);
+        let maxDiepte = Math.min(...levelVerschillen);
+        if(omhoog && maxHoogte < 4 && maxDiepte > 0){resultsList.push(0)}
+        else if (maxHoogte < 0  && maxDiepte > -4){resultsList.push(0)}
+    }
 
     //opdracht2
     for (let line = 0; line < lines.length; line++){//per rapport

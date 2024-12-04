@@ -1,7 +1,7 @@
 let resultsList = [];
 let resultsList2 = [];
-const tekst = "Uitkomst van de som";
-const tekst2 = "Uitkomst van alle operaties";
+const tekst = "";
+const tekst2 = "";
 
 function calculateResult() {
     var inputElement = document.getElementById("inputTextArea");// haal Input waarden op
@@ -21,20 +21,32 @@ function validDigits(n){ //https://stackoverflow.com/questions/7148513/javascrip
 
 //main loop
 function processInputText(inputText) {
-    const vindInstructies = /don't\(\)|do\(\)|mul\([0-9]+,[0-9]+\)/g //https://regexr.com/
-    const instructies = inputText.match(vindInstructies);
-    let operatie = true
-    for (let instructie = 0; instructie < instructies.length; instructie++){
-        if(instructies[instructie] === "do()"){operatie = true;}
-        else if (instructies[instructie] === "don't()"){operatie = false}
-        else {
-            let getallen = instructies[instructie].split(',');
-            let eersteGetal = validDigits(getallen[0]);
-            let tweedeGetal = validDigits(getallen[1]);
-            resultsList.push(eersteGetal*tweedeGetal);
-            if(operatie){resultsList2.push(eersteGetal*tweedeGetal);}
-        }
+    var lines = inputText.split('\n')
+    let lines90 = []
+    for (let line = 0; line < lines.length; line++){lines90.push(lines[line].split(''))}
+    lines90 = lines90[0].map((val, index) => lines90.map(row => row[index]).reverse().join(""))//yeet 90 degrees
+    console.log(lines90);
+
+    //XMASAMX vind maar 1 resultaat met een OR regex :(
+
+    xmasLijst = []
+    //opdracht1
+    for (let line = 0; line < lines.length; line++){
+        const xamsFinder = /XMAS/g //https://regexr.com/
+        const samxFinder = /SAMX/g
+        let xmatches = lines[line].match(xamsFinder);
+        let xmatches90 = lines90[line].match(xamsFinder);
+        let smatches = lines[line].match(samxFinder);
+        let smatches90 = lines90[line].match(samxFinder);
+        if(xmatches){xmasLijst.push(xmatches)};
+        if(xmatches90){xmasLijst.push(xmatches90)};
+        if(smatches){xmasLijst.push(smatches)};
+        if(smatches90){xmasLijst.push(smatches90)};
     };
+
+    console.log(xmasLijst);
+
+
     let kaart = ':D'
     renderKaart(kaart);
 }
