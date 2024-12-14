@@ -89,7 +89,6 @@
         <h2>Render</h2>
         <textarea id="renderTextArea" readonly></textarea>
     </div>
-
     <script src="2024day5.js"></script>
 </body>
 </html>

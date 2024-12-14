@@ -15,6 +15,14 @@ function arrSum(arr) {
         return a + b;
     }, 0);
 }
+function compareSecondColumn(a, b) { // https://stackoverflow.com/questions/16096872/how-to-sort-2-dimensional-array-by-column-value
+    if (a[1] === b[1]) {
+        return 0;
+    }
+    else {
+        return (a[1] < b[1]) ? -1 : 1;
+    }
+}
 
 // main loop
 function processInputText(inputText) {
@@ -22,66 +30,69 @@ function processInputText(inputText) {
     let delen = inputText.split(/\n\s*\n/)
     let regelArray = delen[0]
         .split('\n')
-        .map(v => v.split('|').map(Number));
-
+        .map(v => v.split('|').map(Number))
+        .sort(compareSecondColumn);
+    console.log(regelArray);
     //code om regels om te zetten in een object array
     let regels = {}
     for (let [key, value] of regelArray) {
         if(regels[key]){
             regels[key].push(value)}else{
-        {regels[key] = [value];}
+        {regels[key] = [value];};
       };
     };
     console.log(regels);
+    //maak de mastermap
+    for(let i = 0; i < masterMap.length; i++){
+
+    };
+
+
+    let eindVolgorde = []
 
     let updates = delen[1]
         .split('\n')
         .map(v => v.split(',').map(Number));
-
-    console.log(updates.length);
-    console.log(updates);
-    
     let correcteUpdates = [];
-
-    for(let i = 0; i < updates.length; i++){
-        console.log(`---NIEUWE UPDATE---`);
-        let correct = true;
-        let nieuweUpdate = [];
-        console.log(updates[i]);
-        for(let paginaNr = 0; paginaNr < updates[i].length; paginaNr++){
-            let pagina = updates[i][paginaNr];
-            console.log(`---${pagina}---`);
-            console.log(nieuweUpdate);
-
-            if(nieuweUpdate.length){
-                let relevanteRegels = regels[pagina];
-                let filter;
-                console.log(`relevanteRegels`);
-                console.log(relevanteRegels);
-                if(relevanteRegels){
-                    filter = nieuweUpdate.filter(item => !relevanteRegels.includes(item));
-                    console.log(`filter`);
-                    console.log(filter.length);//dit werkt niet als er geen
-                    console.log(filter);//dit werkt niet als er geen
-                    if(filter.length ===  nieuweUpdate.length && correct){correct = true}else{correct = false};
-                };
+    let fouteUpdates = [];
+        for(let i = 0; i < updates.length; i++){
+            let checkmap = [];
+            let huidigeUpdate = updates[i];
+            for(let master = 0; master < eindVolgorde.length; master++){
+                if(huidigeUpdate.includes(eindVolgorde[master])){checkmap.push(eindVolgorde[master])};
             };
-            nieuweUpdate.push(pagina);
-        };
-        if(correct){
-            correcteUpdates.push(nieuweUpdate);
-            console.log('correcte update');
-            let midden = nieuweUpdate[Math.round((nieuweUpdate.length - 1) / 2)];
-            console.log(`${nieuweUpdate} -- Middelste nummer: ${midden}`);
-            resultsList.push(midden);
-        }else{console.log('FOUTE update >:(');};
-    };
-    console.log(`correcteUpdates`);
-    console.log(correcteUpdates);
-    
-    //opdracht 2
 
- 
+            console.log(`---NIEUWE UPDATE---`);
+            let correct = true;
+            let nieuweUpdate = [];
+            console.log(updates[i]);
+            for(let paginaNr = 0; paginaNr < updates[i].length; paginaNr++){
+                let pagina = updates[i][paginaNr];
+                if(nieuweUpdate.length){
+                    let relevanteRegels = regels[pagina];
+                    let filter;
+                    if(relevanteRegels){
+                        filter = nieuweUpdate.filter(item => !relevanteRegels.includes(item));
+                        if(filter.length ===  nieuweUpdate.length && correct){correct = true}else{correct = false};
+                    };
+                };
+                nieuweUpdate.push(pagina);
+            };
+            if(correct){
+                correcteUpdates.push(nieuweUpdate);
+                console.log('correcte update');
+                let midden = nieuweUpdate[Math.round((nieuweUpdate.length - 1) / 2)];
+                resultsList.push(midden);
+            }else{
+                console.log('FOUTE update >:(');
+                fouteUpdates.push(checkmap);
+                let midden = checkmap[Math.round((checkmap.length - 1) / 2)];
+                resultsList2.push(midden);
+                };
+        };//4811 | 4587 - answer too low
+
+    console.log(fouteUpdates);
+
     let kaart = regels;
     renderKaart(kaart);
 }
