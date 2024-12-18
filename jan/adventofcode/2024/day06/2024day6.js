@@ -3,7 +3,10 @@
 
 let resultsList = [];
 let resultsList2 = [];
-const tekst = "steppen tot de bewaker weg is";
+let actieve_bewakers = 0;
+let opdracht1 = [];
+let opdracht2 = [];
+const tekst = "stappen tot de bewaker weg is";
 const tekst2 = "Mogenlijk nieuwe obstakelpunten";
 
 function calculateResult() {
@@ -18,38 +21,32 @@ function arrSum(arr) {
         return a + b;
     }, 0);
 }
-// get random whole numbers in a specific range
-// @see https://stackoverflow.com/a/1527820/2124254
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-    }
 
-//https://stackoverflow.com/questions/20339466/how-to-remove-duplicates-from-a-two-dimensional-array
-function removeDuplicates(arr) {
-    var uniques = [];
-    var itemsFound = {};
-    for(var i = 0, l = arr.length; i < l; i++) {
-        var stringified = JSON.stringify(arr[i]);
-        if(itemsFound[stringified]) { continue; }
-        uniques.push(arr[i]);
-        itemsFound[stringified] = true;
-    }
-    return uniques;
-}
-
+function isArrayInArray(arr, item){ //https://stackoverflow.com/questions/41661287/how-to-check-if-an-array-contains-another-array
+    var item_as_string = JSON.stringify(item);
+  
+    var contains = arr.some(function(ele){
+      return JSON.stringify(ele) === item_as_string;
+    });
+    return contains;
+  }
+  
 
 // main loop
 function processInputText(inputText) {
     //opdracht 1
     let kaart = inputText.split('\n').map(function(x){return x.split("")});
-    var grid = 10;
+    var grid = 1;
+    var rendersize = 10
     var count = 0;
     let running = true;
+    let shadow_guards = [];
+    let confirmed_shadow_obstacles = [];
 
     var canvas = document.getElementById('game');
     var context = canvas.getContext('2d');
-    canvas.width = (kaart.length)*grid;
-    canvas.height = (kaart[0].length)*grid;
+    canvas.width = (kaart.length)*rendersize;
+    canvas.height = (kaart[0].length)*rendersize;
 
     // the canvas width & height, guard x & y, and the obstacle x & y, all need to be a multiples of the grid size in order for collision detection to work
     var guard = {
@@ -63,11 +60,8 @@ function processInputText(inputText) {
     dy: -grid,
     richting: 'up',
 
-    // keep track of all grids the guard body occupies
+    // keep track of all steps the guard has taken
     cells: [],
-
-    // length of the guard. grows when eating an obstacle
-    maxCells: 1
     };
 
     let obstacles = [];
@@ -82,69 +76,226 @@ function processInputText(inputText) {
     };
     console.log(obstacles);
 
+    const guard_start = {...guard};
+
+
     ////////////////// game loop ///////////////////
     function loop() {
-    if(running){requestAnimationFrame(loop)};
+    requestAnimationFrame(loop)
 
     // slow game loop to 15 fps instead of 60 (60/15 = 4)
-    if (++count < 0.001) {
+    if (++count < 1) {
         return;
     }
-
     count = 0;
     context.clearRect(0,0,canvas.width,canvas.height);
+    
+    if(running){//als opdracht 1 nog loopt
+        // move guard by it's velocity
+        guard.x += guard.dx;
+        guard.y += guard.dy;
+        guard.next_x = (guard.x + guard.dx);
+        guard.next_y = (guard.y + guard.dy);
 
-    // move guard by it's velocity
-    guard.x += guard.dx;
-    guard.y += guard.dy;
-    guard.next_x = (guard.x + guard.dx);
-    guard.next_y = (guard.y + guard.dy);
+        //shadow guard mag niet spawnen als er een obstakel is.
 
-    // wrap guard position vertically on edge of screen
-    if (guard.y < 0 || guard.y >= canvas.height) {
-        console.log('thats all folks');
-        running = false;
-        let opdracht1Score  = removeDuplicates(guard.cells);
-        resultsList = [opdracht1Score.length];
-        displayResults();
-    }
+        //TODO
+        console.log(guard_start);
+            actieve_bewakers++;
+            displayResults();
+            shadow_guards.push({
+                x: guard_start.x,
+                y: guard_start.y,
+                next_x: guard_start.next_x,
+                next_y: guard_start.next_y,
+                dx: guard_start.dx,
+                dy: guard_start.dy,
+                richting: 'up',
+                cells: [],
+                steps: [],
+                active: true,
+                looping: false,
+                obstacle_x: guard.next_x,  
+                obstacle_y: guard.next_y, 
+            });
 
-    // keep track of where guard has been.
-    guard.cells.unshift({x: guard.x, y: guard.y})
+        // keep track of where guard has been.
+        guard.cells.unshift({x: guard.x, y: guard.y});
+        if(!(opdracht1.includes(`${guard.x}:${guard.y}`))){opdracht1.push(`${guard.x}:${guard.y}`)};
+
+        // guard leaves the screen, game over
+        if (guard.y < 0 || guard.y > kaart.length-1 ||guard.x < 0 || guard.x > kaart[0].length-1) {
+            running = false;
+            resultsList = [opdracht1.length];
+            displayResults();
+        }
+
+        //check if guard hits obstacle
+        if (kaart[guard.next_y]?.[guard.next_x] !== undefined) {
+            if (kaart[guard.next_y][guard.next_x] === '#') {
+                    if(guard.richting === 'up') { 
+                        if (kaart[guard.y]?.[guard.x + 1] !== '#') {
+                            guard.dx = grid;
+                            guard.dy = 0;
+                            guard.richting = 'right';
+                        } else {
+                            guard.dy = grid;
+                            guard.dx = 0;
+                            guard.richting = 'down';
+                        }
+                    }else if(guard.richting === 'down') {
+                        if (kaart[guard.y]?.[guard.x - 1] !== '#') {
+                            guard.dx = -grid;
+                            guard.dy = 0;
+                            guard.richting = 'left';
+                        } else {
+                            guard.dy = -grid;
+                            guard.dx = 0;
+                            guard.richting = 'up';
+                        }
+                    }
+                    else if(guard.richting === 'left')  {
+                        if (kaart[guard.y-1]?.[guard.x] !== '#') {
+                            guard.dy = -grid;
+                            guard.dx = 0;
+                            guard.richting = 'up';
+                        } else {
+                            guard.dx = grid;
+                            guard.dy = 0;
+                            guard.richting = 'right';
+                        }
+                    }
+                    else if(guard.richting === 'right') {
+                        if (kaart[guard.y+1]?.[guard.x] !== '#') {
+                            guard.dy = grid;
+                            guard.dx = 0;
+                            guard.richting = 'down';
+                        } else {
+                            guard.dx = -grid;
+                            guard.dy = 0;
+                            guard.richting = 'left';
+                        }
+                    };
+                };
+            };
+        };
+
+    //release the shadowguards!
+    shadow_guards.forEach(function(shadowguard, index) {
+        if(shadowguard.active){
+
+            // move shadow guard by it's velocity
+            shadowguard.x += shadowguard.dx;
+            shadowguard.y += shadowguard.dy;
+            shadowguard.next_x = (shadowguard.x + shadowguard.dx);
+            shadowguard.next_y = (shadowguard.y + shadowguard.dy);
+
+            // shadow guard leaves the screen, game over
+            if (shadowguard.y < 0 || shadowguard.y > kaart.length-1 ||shadowguard.x < 0 || shadowguard.x > kaart[0].length-1) 
+                { shadowguard.active = false; actieve_bewakers--; displayResults();};
+            
+            // track step and detect loop
+            if(!(shadowguard.looping)){
+            if(shadowguard.steps.includes(`${shadowguard.x}:${shadowguard.y}:${shadowguard.richting}`)){
+                shadowguard.looping = true;
+                actieve_bewakers--;
+                if(!(isArrayInArray(confirmed_shadow_obstacles,[shadowguard.obstacle_y,shadowguard.obstacle_x]))){
+                    resultsList2.push(1);
+                    displayResults();
+                    confirmed_shadow_obstacles.push([shadowguard.obstacle_y,shadowguard.obstacle_x]);
+                    confirmed_shadow_obstacles.sort();
+                };
+            }else { shadowguard.steps.push(`${shadowguard.x}:${shadowguard.y}:${shadowguard.richting}`);};};
+
+            //check if shadow_guards hits obstacle
+            if (kaart[shadowguard.next_y]?.[shadowguard.next_x] !== undefined) {
+                if (kaart[shadowguard.next_y][shadowguard.next_x] === '#' || (shadowguard.next_y === shadowguard.obstacle_y && shadowguard.next_x === shadowguard.obstacle_x )) {
+                        if(shadowguard.richting === 'up') { 
+                            if (kaart[shadowguard.y]?.[shadowguard.x + 1] !== '#' || (shadowguard.y === shadowguard.obstacle_y && shadowguard.x + 1 === shadowguard.obstacle_x )) {
+                                shadowguard.dx = grid;
+                                shadowguard.dy = 0;
+                                shadowguard.richting = 'right';
+                            } else {
+                                shadowguard.dy = grid;
+                                shadowguard.dx = 0;
+                                shadowguard.richting = 'down';
+                            }
+                        }else if(shadowguard.richting === 'down') {
+                            if (kaart[shadowguard.y]?.[shadowguard.x - 1] !== '#' || (shadowguard.y === shadowguard.obstacle_y && shadowguard.x - 1 === shadowguard.obstacle_x )) {
+                                shadowguard.dx = -grid;
+                                shadowguard.dy = 0;
+                                shadowguard.richting = 'left';
+                            } else {
+                                shadowguard.dy = -grid;
+                                shadowguard.dx = 0;
+                                shadowguard.richting = 'up';
+                            }
+                        }
+                        else if(shadowguard.richting === 'left')  {
+                            if (kaart[shadowguard.y-1]?.[shadowguard.x] !== '#' || (shadowguard.y - 1 === shadowguard.obstacle_y && shadowguard.x === shadowguard.obstacle_x )) {
+                                shadowguard.dy = -grid;
+                                shadowguard.dx = 0;
+                                shadowguard.richting = 'up';
+                            } else {
+                                shadowguard.dx = grid;
+                                shadowguard.dy = 0;
+                                shadowguard.richting = 'right';
+                            }
+                        }
+                        else if(shadowguard.richting === 'right') {
+                            if (kaart[shadowguard.y+1]?.[shadowguard.x] !== '#'|| (shadowguard.y + 1 === shadowguard.obstacle_y && shadowguard.x === shadowguard.obstacle_x )) {
+                                shadowguard.dy = grid;
+                                shadowguard.dx = 0;
+                                shadowguard.richting = 'down';
+                            } else {
+                                shadowguard.dx = -grid;
+                                shadowguard.dy = 0;
+                                shadowguard.richting = 'left';
+                            }
+                        };
+                    };
+                };}})
+
+
 
     //draw path
-    context.fillStyle = 'grey';
+    context.fillStyle = 'teal';
     guard.cells.forEach(function(cell, index) {
      // drawing 1 px smaller than the grid creates a grid effect in the snake body so you can see how long it is
-        context.fillRect(cell.x, cell.y, grid-1, grid-1);
+        context.fillRect(cell.x*rendersize, cell.y*rendersize, rendersize-1, rendersize-1);
     })
     // draw obstacle
     context.fillStyle = 'red';
     obstacles.forEach(function(item, index) {
-        context.fillRect(item[1], item[0], grid-1, grid-1);
+        context.fillRect(item[1]*rendersize, item[0]*rendersize, rendersize-1, rendersize-1);
     })
+    // draw shadow guard obstacles
+    if(confirmed_shadow_obstacles){
+    context.fillStyle = 'yellow';
+    confirmed_shadow_obstacles.forEach(function(confirmed_shadow_obstacle, index) {
+        context.fillRect(confirmed_shadow_obstacle[1]*rendersize, confirmed_shadow_obstacle[0]*rendersize, rendersize-1, rendersize-1);
+    })}
+
     // draw guard
     context.fillStyle = 'green';
-    context.fillRect(guard.x, guard.y, grid-1, grid-1);
+    context.fillRect(guard.x*rendersize, guard.y*rendersize, rendersize-1, rendersize-1);
 
     context.fillStyle = 'blue';
-    context.fillRect(guard.next_x, guard.next_y, grid-1, grid-1);
+    context.fillRect(guard.next_x*rendersize, guard.next_y*rendersize, rendersize-1, rendersize-1);
     //console.log(`${guard.next_x} ${guard.next_y} ${guard.x} ${guard.y}`);
 
-    //check if guard hits obstacle
-    for (rij = 0; rij < obstacles.length; rij++) { 
-        if(obstacles[rij][0] === guard.next_y && obstacles[rij][1] === guard.next_x){
-                 if(guard.richting === 'up')    { guard.dx = grid;  guard.dy = 0; guard.richting = 'right'}
-            else if(guard.richting === 'down')  { guard.dx = -grid; guard.dy = 0; guard.richting = 'left'}
-            else if(guard.richting === 'left')  { guard.dy = -grid; guard.dx = 0; guard.richting = 'up'}
-            else if(guard.richting === 'right') { guard.dy = grid;  guard.dx = 0; guard.richting = 'down'};
-        };
-    };
+
+    // draw shadow guards
+    context.fillStyle = 'purple';
+    shadow_guards.forEach(function(shadowguard, index) {
+        context.fillRect(shadowguard.x*rendersize, shadowguard.y*rendersize, rendersize-1, rendersize-1);
+    })
+
 
     }// end game loop
 
     // start the game
-    if(running){requestAnimationFrame(loop)};
+    requestAnimationFrame(loop)
 }
 
 function displayResults() {
@@ -153,5 +304,8 @@ function displayResults() {
     
     //stuur info naar HTML document output
     var outputElement = document.getElementById("outputTextArea");
-    outputElement.value = `${tekst} : ${resultsListSum} \n${tekst2}: ${resultsListSum2}`;
+    outputElement.value = `${tekst} : ${resultsListSum} \n${tekst2}: ${resultsListSum2} \nAantal actieve bewakers: ${actieve_bewakers}`;
 };
+
+//1710 te hoog
+//1633/1634 te laag

@@ -3,26 +3,23 @@
 
 let resultsList = [];
 let resultsList2 = [];
-const tekst = "";
-const tekst2 = "";
+let opdracht1 = [];
+let opdracht2 = [];
+const tekst = "stappen tot de bewaker weg is";
+const tekst2 = "Mogenlijk nieuwe obstakelpunten";
 
 function calculateResult() {
     var inputElement = document.getElementById("inputTextArea");// haal Input waarden op
     var inputText = inputElement.value;
     processInputText(inputText);// verwerk input waarden
-    displayResults();// geef resultaat terug aan webpagina en console.log
 }
+
 //functions
 function arrSum(arr) { 
     return arr.reduce(function(a, b) {
         return a + b;
     }, 0);
 }
-// get random whole numbers in a specific range
-// @see https://stackoverflow.com/a/1527820/2124254
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-    }
 
 // main loop
 function processInputText(inputText) {
@@ -30,6 +27,8 @@ function processInputText(inputText) {
     let kaart = inputText.split('\n').map(function(x){return x.split("")});
     var grid = 10;
     var count = 0;
+    let running = true;
+    let shadow_guards = [];
 
     var canvas = document.getElementById('game');
     var context = canvas.getContext('2d');
@@ -40,112 +39,161 @@ function processInputText(inputText) {
     var guard = {
     x: grid,
     y: grid,
+    next_x: grid,
+    next_y: grid,
 
     // guard velocity. moves one grid length every frame in either the x or y direction
     dx: 0,
     dy: -grid,
+    richting: 'up',
 
-    // keep track of all grids the guard body occupies
+    // keep track of all steps the guard has taken
     cells: [],
 
-    // length of the guard. grows when eating an obstacle
-    maxCells: 1
     };
-    var obstacle = {
-    x: 0,
-    y: 32
-    };
+
+    let obstacles = [];
 
     //find guards and obstacles
     for (rij = 0; rij < kaart.length; rij++) {
         for (kol = 0; kol < kaart.length; kol++) {
             let cel = kaart[rij][kol];
-            if(cel === '^'){guard.x = rij*grid; guard.y = kol*grid;};
-            if(cel === '#'){};
+            if(cel === '^'){guard.y = rij*grid; guard.x = kol*grid;};
+            if(cel === '#'){obstacles.push([rij*grid,kol*grid])};
         };
     };
 
-    // game loop
+    console.log(obstacles);
+
+    ////////////////// game loop ///////////////////
     function loop() {
-    requestAnimationFrame(loop);
+    requestAnimationFrame(loop)
 
     // slow game loop to 15 fps instead of 60 (60/15 = 4)
-    if (++count < 4) {
+    if (++count < 120) {
         return;
     }
-
     count = 0;
     context.clearRect(0,0,canvas.width,canvas.height);
+    
+    if(running){//als opdracht 1 nog loopt
+        // move guard by it's velocity
+        guard.x += guard.dx;
+        guard.y += guard.dy;
+        guard.next_x = (guard.x + guard.dx);
+        guard.next_y = (guard.y + guard.dy);
 
-    // move guard by it's velocity
-    guard.x += guard.dx;
-    guard.y += guard.dy;
+        //shadow guard mag niet spawnen als er een obstakel is.
+        let next_shadow = [];
+        if(     guard.richting === 'up')    { next_shadow = [ grid,     0,  'right']}
+        else if(guard.richting === 'right') { next_shadow = [    0,  grid,  'down' ]}
+        else if(guard.richting === 'down')  { next_shadow = [-grid,     0,  'left' ]}
+        else if(guard.richting === 'left')  { next_shadow = [    0, -grid,  'up'   ]};
 
-    // wrap guard position horizontally on edge of screen
-    if (guard.x < 0) {
-        guard.x = canvas.width - grid;
+        let spawn_next_shadow = true;
+        for (rij = 0; rij < obstacles.length; rij++) {
+            if(obstacles[rij][0] === next_shadow[1] && obstacles[rij][1] === next_shadow[0]){
+                spawn_next_shadow = false;
+                console.log('cant spawn shadow, obstacle in the way');
+            };}
+
+        if(spawn_next_shadow){
+            shadow_guards.push({
+                x: guard.x,
+                y: guard.y,
+                next_x: guard.x,
+                next_y: guard.y,
+                dx: next_shadow[0],
+                dy: next_shadow[1],
+                richting: next_shadow[2],
+                cells: [],
+                active: true,
+                obstacle_x: guard.next_x,  //waarom werkt dit niet?
+                obstacle_y: guard.next_y,  //waarom werkt dit niet?
+                });
+        };
+
+        // guard leaves the screen, game over
+        if (guard.y < 0 || guard.y > canvas.height) {
+            running = false;
+            resultsList = [opdracht1.length];
+            displayResults();
+        }
+        // keep track of where guard has been.
+        guard.cells.unshift({x: guard.x, y: guard.y})
+        if(!(opdracht1.includes(`${guard.x}:${guard.y}`))){opdracht1.push(`${guard.x}:${guard.y}`)};
+
+        //check if guard hits obstacle
+        for (rij = 0; rij < obstacles.length; rij++) {
+            if(obstacles[rij][0] === guard.next_y && obstacles[rij][1] === guard.next_x){
+                    if(guard.richting === 'up')    { guard.dx = grid;  guard.dy = 0; guard.richting = 'right'}
+                else if(guard.richting === 'down')  { guard.dx = -grid; guard.dy = 0; guard.richting = 'left'}
+                else if(guard.richting === 'left')  { guard.dy = -grid; guard.dx = 0; guard.richting = 'up'}
+                else if(guard.richting === 'right') { guard.dy = grid;  guard.dx = 0; guard.richting = 'down'};
+            };
+        };
     }
-    else if (guard.x >= canvas.width) {
-        guard.x = 0;
-    }
 
-    // wrap guard position vertically on edge of screen
-    if (guard.y < 0) {
-        guard.y = canvas.height - grid;
-    }
-    else if (guard.y >= canvas.height) {
-        guard.y = 0;
-    }
+    //release the shadowguards!
+    shadow_guards.forEach(function(shadowguard, index) {
+        if(shadowguard.active){
+            // move shadow guard by it's velocity
+            shadowguard.x += shadowguard.dx;
+            shadowguard.y += shadowguard.dy;
+            shadowguard.next_x = (shadowguard.x + shadowguard.dx);
+            shadowguard.next_y = (shadowguard.y + shadowguard.dy);
 
-    // keep track of where guard has been. front of the array is always the head
-    guard.cells.unshift({x: guard.x, y: guard.y});
+            // shadow guard leaves the screen, game over
+            if (shadowguard.y < 0 || shadowguard.y > canvas.height) { shadowguard.active = false };
 
-    // remove cells as we move away from them
-    if (guard.cells.length > guard.maxCells) {
-        guard.cells.pop();
-    }
+            //check if shadow_guards hits obstacle
+            for (rij = 0; rij < obstacles.length; rij++) { 
+                if((obstacles[rij][0] === shadowguard.next_y && obstacles[rij][1] === shadowguard.next_x) ||
+                  (shadowguard.obstacle_x === shadowguard.next_y && shadowguard.obstacle_y === shadowguard.next_x)
+                ){
+                         if(shadowguard.richting === 'up')     {shadowguard.dx =  grid;  shadowguard.dy = 0; shadowguard.richting = 'right'}
+                    else if(shadowguard.richting === 'right') { shadowguard.dy =  grid;  shadowguard.dx = 0; shadowguard.richting = 'down'}
+                    else if(shadowguard.richting === 'down')  { shadowguard.dx = -grid;  shadowguard.dy = 0; shadowguard.richting = 'left'}
+                    else if(shadowguard.richting === 'left')  { shadowguard.dy = -grid;  shadowguard.dx = 0; shadowguard.richting = 'up'};
+                };
+            };
+    }})
 
+    //draw path
+    context.fillStyle = 'teal';
+    guard.cells.forEach(function(cell, index) {
+     // drawing 1 px smaller than the grid creates a grid effect in the snake body so you can see how long it is
+        context.fillRect(cell.x, cell.y, grid-1, grid-1);
+    })
     // draw obstacle
     context.fillStyle = 'red';
-    context.fillRect(obstacle.x, obstacle.y, grid-1, grid-1);
-
-    // draw guard one cell at a time
+    obstacles.forEach(function(item, index) {
+        context.fillRect(item[1], item[0], grid-1, grid-1);
+    })
+    // draw guard
     context.fillStyle = 'green';
-    guard.cells.forEach(function(cell, index) {
+    context.fillRect(guard.x, guard.y, grid-1, grid-1);
 
-        // drawing 1 px smaller than the grid creates a grid effect in the guard body so you can see how long it is
-        context.fillRect(cell.x, cell.y, grid-1, grid-1);
+    context.fillStyle = 'blue';
+    context.fillRect(guard.next_x, guard.next_y, grid-1, grid-1);
+    //console.log(`${guard.next_x} ${guard.next_y} ${guard.x} ${guard.y}`);
 
-        // guard ate obstacle
-        if (cell.x === obstacle.x && cell.y === obstacle.y) {
-        guard.maxCells++;
+    // // draw shadow guard obstacles
+    // context.fillStyle = 'yellow';
+    // shadow_guards.forEach(function(shadowguard, index) {
+    //     context.fillRect(shadowguard.obstacle_y, shadowguard.obstacle_y, grid-1, grid-1);
+    // })
+    // draw shadow guards
+    context.fillStyle = 'purple';
+    shadow_guards.forEach(function(shadowguard, index) {
+        context.fillRect(shadowguard.x, shadowguard.y, grid-1, grid-1);
+    })
 
-        // canvas is 400x400 which is 25x25 grids
-        obstacle.x = getRandomInt(0, 25) * grid;
-        obstacle.y = getRandomInt(0, 25) * grid;
-        }
 
-        // check collision with all cells after this one (modified bubble sort)
-        for (var i = index + 1; i < guard.cells.length; i++) {
-
-        // guard occupies same space as a body part. reset game
-        if (cell.x === guard.cells[i].x && cell.y === guard.cells[i].y) {
-            guard.x = 160;
-            guard.y = 160;
-            guard.cells = [];
-            guard.maxCells = 4;
-            guard.dx = grid;
-            guard.dy = 0;
-
-            obstacle.x = getRandomInt(0, 25) * grid;
-            obstacle.y = getRandomInt(0, 25) * grid;
-        }
-        }
-    });
-    }
+    }// end game loop
 
     // start the game
-    requestAnimationFrame(loop);
+    requestAnimationFrame(loop)
 }
 
 function displayResults() {
