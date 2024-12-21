@@ -75,13 +75,13 @@ function processInputText(inputText) {
         };
     };
     console.log(obstacles);
-
     const guard_start = {...guard};
 
 
     ////////////////// game loop ///////////////////
     function loop() {
     requestAnimationFrame(loop)
+    displayResults()
 
     // slow game loop to 15 fps instead of 60 (60/15 = 4)
     if (++count < 1) {
@@ -92,32 +92,16 @@ function processInputText(inputText) {
     
     if(running){//als opdracht 1 nog loopt
         // move guard by it's velocity
+
+
         guard.x += guard.dx;
         guard.y += guard.dy;
         guard.next_x = (guard.x + guard.dx);
         guard.next_y = (guard.y + guard.dy);
 
-        //shadow guard mag niet spawnen als er een obstakel is.
 
         //TODO
-        console.log(guard_start);
-            actieve_bewakers++;
-            displayResults();
-            shadow_guards.push({
-                x: guard_start.x,
-                y: guard_start.y,
-                next_x: guard_start.next_x,
-                next_y: guard_start.next_y,
-                dx: guard_start.dx,
-                dy: guard_start.dy,
-                richting: 'up',
-                cells: [],
-                steps: [],
-                active: true,
-                looping: false,
-                obstacle_x: guard.next_x,  
-                obstacle_y: guard.next_y, 
-            });
+        //console.log(guard_start);
 
         // keep track of where guard has been.
         guard.cells.unshift({x: guard.x, y: guard.y});
@@ -127,7 +111,7 @@ function processInputText(inputText) {
         if (guard.y < 0 || guard.y > kaart.length-1 ||guard.x < 0 || guard.x > kaart[0].length-1) {
             running = false;
             resultsList = [opdracht1.length];
-            displayResults();
+            //displayResults();
         }
 
         //check if guard hits obstacle
@@ -178,6 +162,23 @@ function processInputText(inputText) {
                     };
                 };
             };
+            actieve_bewakers++;
+            //displayResults();
+            shadow_guards.push({
+                x: guard_start.x,
+                y: guard_start.y,
+                next_x: guard_start.next_x,
+                next_y: guard_start.next_y,
+                dx: guard_start.dx,
+                dy: guard_start.dy,
+                richting: 'up',
+                cells: [],
+                steps: [],
+                active: true,
+                looping: false,
+                obstacle_x: guard.x,  
+                obstacle_y: guard.y,
+            });
         };
 
     //release the shadowguards!
@@ -192,7 +193,7 @@ function processInputText(inputText) {
 
             // shadow guard leaves the screen, game over
             if (shadowguard.y < 0 || shadowguard.y > kaart.length-1 ||shadowguard.x < 0 || shadowguard.x > kaart[0].length-1) 
-                { shadowguard.active = false; actieve_bewakers--; displayResults();};
+                { shadowguard.active = false; actieve_bewakers--;};
             
             // track step and detect loop
             if(!(shadowguard.looping)){
@@ -201,7 +202,7 @@ function processInputText(inputText) {
                 actieve_bewakers--;
                 if(!(isArrayInArray(confirmed_shadow_obstacles,[shadowguard.obstacle_y,shadowguard.obstacle_x]))){
                     resultsList2.push(1);
-                    displayResults();
+                    //displayResults();
                     confirmed_shadow_obstacles.push([shadowguard.obstacle_y,shadowguard.obstacle_x]);
                     confirmed_shadow_obstacles.sort();
                 };
@@ -211,17 +212,17 @@ function processInputText(inputText) {
             if (kaart[shadowguard.next_y]?.[shadowguard.next_x] !== undefined) {
                 if (kaart[shadowguard.next_y][shadowguard.next_x] === '#' || (shadowguard.next_y === shadowguard.obstacle_y && shadowguard.next_x === shadowguard.obstacle_x )) {
                         if(shadowguard.richting === 'up') { 
-                            if (kaart[shadowguard.y]?.[shadowguard.x + 1] !== '#' || (shadowguard.y === shadowguard.obstacle_y && shadowguard.x + 1 === shadowguard.obstacle_x )) {
-                                shadowguard.dx = grid;
-                                shadowguard.dy = 0;
-                                shadowguard.richting = 'right';
-                            } else {
+                            if (kaart[shadowguard.y]?.[shadowguard.x + 1] === '#' || (shadowguard.y === shadowguard.obstacle_y && shadowguard.x + 1 === shadowguard.obstacle_x )) {
                                 shadowguard.dy = grid;
                                 shadowguard.dx = 0;
                                 shadowguard.richting = 'down';
+                            } else {
+                                shadowguard.dx = grid;
+                                shadowguard.dy = 0;
+                                shadowguard.richting = 'right';
                             }
                         }else if(shadowguard.richting === 'down') {
-                            if (kaart[shadowguard.y]?.[shadowguard.x - 1] !== '#' || (shadowguard.y === shadowguard.obstacle_y && shadowguard.x - 1 === shadowguard.obstacle_x )) {
+                            if (kaart[shadowguard.y]?.[shadowguard.x - 1] !== '#' && !(shadowguard.y === shadowguard.obstacle_y && shadowguard.x - 1 === shadowguard.obstacle_x )) {
                                 shadowguard.dx = -grid;
                                 shadowguard.dy = 0;
                                 shadowguard.richting = 'left';
@@ -232,7 +233,7 @@ function processInputText(inputText) {
                             }
                         }
                         else if(shadowguard.richting === 'left')  {
-                            if (kaart[shadowguard.y-1]?.[shadowguard.x] !== '#' || (shadowguard.y - 1 === shadowguard.obstacle_y && shadowguard.x === shadowguard.obstacle_x )) {
+                            if (kaart[shadowguard.y-1]?.[shadowguard.x] !== '#' && !(shadowguard.y - 1 === shadowguard.obstacle_y && shadowguard.x === shadowguard.obstacle_x )) {
                                 shadowguard.dy = -grid;
                                 shadowguard.dx = 0;
                                 shadowguard.richting = 'up';
@@ -243,7 +244,7 @@ function processInputText(inputText) {
                             }
                         }
                         else if(shadowguard.richting === 'right') {
-                            if (kaart[shadowguard.y+1]?.[shadowguard.x] !== '#'|| (shadowguard.y + 1 === shadowguard.obstacle_y && shadowguard.x === shadowguard.obstacle_x )) {
+                            if (kaart[shadowguard.y+1]?.[shadowguard.x] !== '#'&& !(shadowguard.y + 1 === shadowguard.obstacle_y && shadowguard.x === shadowguard.obstacle_x )) {
                                 shadowguard.dy = grid;
                                 shadowguard.dx = 0;
                                 shadowguard.richting = 'down';
@@ -256,19 +257,19 @@ function processInputText(inputText) {
                     };
                 };}})
 
-
-
     //draw path
     context.fillStyle = 'teal';
     guard.cells.forEach(function(cell, index) {
      // drawing 1 px smaller than the grid creates a grid effect in the snake body so you can see how long it is
         context.fillRect(cell.x*rendersize, cell.y*rendersize, rendersize-1, rendersize-1);
     })
+
     // draw obstacle
-    context.fillStyle = 'red';
+    context.fillStyle = 'green';
     obstacles.forEach(function(item, index) {
         context.fillRect(item[1]*rendersize, item[0]*rendersize, rendersize-1, rendersize-1);
     })
+
     // draw shadow guard obstacles
     if(confirmed_shadow_obstacles){
     context.fillStyle = 'yellow';
@@ -284,11 +285,10 @@ function processInputText(inputText) {
     context.fillRect(guard.next_x*rendersize, guard.next_y*rendersize, rendersize-1, rendersize-1);
     //console.log(`${guard.next_x} ${guard.next_y} ${guard.x} ${guard.y}`);
 
-
     // draw shadow guards
     context.fillStyle = 'purple';
     shadow_guards.forEach(function(shadowguard, index) {
-        context.fillRect(shadowguard.x*rendersize, shadowguard.y*rendersize, rendersize-1, rendersize-1);
+    context.fillRect(shadowguard.x*rendersize, shadowguard.y*rendersize, rendersize-1, rendersize-1);
     })
 
 
@@ -299,8 +299,8 @@ function processInputText(inputText) {
 }
 
 function displayResults() {
-    let resultsListSum = arrSum(resultsList);console.log(`${tekst} : ${resultsListSum}`);
-    let resultsListSum2 = arrSum(resultsList2);console.log(`${tekst2} : ${resultsListSum2}`);
+    let resultsListSum = arrSum(resultsList);//console.log(`${tekst} : ${resultsListSum}`);
+    let resultsListSum2 = arrSum(resultsList2);//console.log(`${tekst2} : ${resultsListSum2}`);
     
     //stuur info naar HTML document output
     var outputElement = document.getElementById("outputTextArea");
