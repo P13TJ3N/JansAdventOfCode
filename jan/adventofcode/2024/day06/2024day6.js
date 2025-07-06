@@ -92,8 +92,6 @@ function processInputText(inputText) {
     
     if(running){//als opdracht 1 nog loopt
         // move guard by it's velocity
-
-
         guard.x += guard.dx;
         guard.y += guard.dy;
         guard.next_x = (guard.x + guard.dx);
@@ -111,7 +109,6 @@ function processInputText(inputText) {
         if (guard.y < 0 || guard.y > kaart.length-1 ||guard.x < 0 || guard.x > kaart[0].length-1) {
             running = false;
             resultsList = [opdracht1.length];
-            //displayResults();
         }
 
         //check if guard hits obstacle
@@ -202,7 +199,6 @@ function processInputText(inputText) {
                 actieve_bewakers--;
                 if(!(isArrayInArray(confirmed_shadow_obstacles,[shadowguard.obstacle_y,shadowguard.obstacle_x]))){
                     resultsList2.push(1);
-                    //displayResults();
                     confirmed_shadow_obstacles.push([shadowguard.obstacle_y,shadowguard.obstacle_x]);
                     confirmed_shadow_obstacles.sort();
                 };
@@ -306,6 +302,3 @@ function displayResults() {
     var outputElement = document.getElementById("outputTextArea");
     outputElement.value = `${tekst} : ${resultsListSum} \n${tekst2}: ${resultsListSum2} \nAantal actieve bewakers: ${actieve_bewakers}`;
 };
-
-//1710 te hoog
-//1633/1634 te laag
