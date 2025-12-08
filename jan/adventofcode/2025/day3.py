@@ -2,6 +2,7 @@
 # paste them together
 # add to total_joltage 
 
+# input_csv = 'day3_input'
 input_csv = 'day3_input'
 input = (open(input_csv))
 
@@ -37,7 +38,7 @@ def joltage_finder(input):
             #first number = highest number
             first_number = numbers[highest_position_index]
             second_number_list = numbers[highest_position_index:]
-            second_number_list.pop()
+            second_number_list.pop(0)
             print(second_number_list)
             second_number = max(second_number_list)
 

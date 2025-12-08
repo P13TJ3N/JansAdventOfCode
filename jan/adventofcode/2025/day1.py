@@ -29,10 +29,9 @@ def decode(dail_position,input):
     return password
 
 def get_rotation(instruction):
-    if(len(instruction)>2):
-        rotation_number = int(f'{instruction[1]}{instruction[2]}')
-    else:
-        rotation_number = int(f'{instruction[1]}')
+    rotation_number = int(instruction[1:])
+    if rotation_number > 99:
+        rotation_number = rotation_number%100
     
     if(instruction[0]=="L"):
         rotation_number = rotation_number*-1
