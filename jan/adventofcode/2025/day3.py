@@ -1,52 +1,35 @@
 # find largest number, and then the largest number to the left of it
 # paste them together
-# add to total_joltage 
+# add to total_joltage
 
 # input_csv = 'day3_input'
-input_csv = 'day3_input'
-input = (open(input_csv))
 
-def joltage_finder(input):
+def joltage_finder_supreme(input: str, max_cell_count: int):
+    input = input.read().strip().split()
     total_joltage = 0
     for cells in input:
-        cells = cells.strip()
-        print(cells)
-        # convert cells to list of int
-        numbers = []
-        cells.split()
-        for i in cells:
-            numbers.append(int(i))
-        
-        first_number = 0
-        second_number = 0
-        
-        # find position of earliest highest number of cells
-        print(max(numbers))
-        highest_position_index = numbers.index(max(numbers))
-        print(f'{highest_position_index} == {len(numbers)-1} = {highest_position_index == len(numbers)-1}')
-
-        # if highest number position == length of array (is last number):
-        if (highest_position_index == len(numbers)-1):
-            # last number is second number
-            second_number = numbers[len(numbers)-1]
-            # find second highest number, make that first number
-            numbers.pop(-1)
-            print(numbers)
-            first_number = max(numbers)
-
-        else:  
-            #first number = highest number
-            first_number = numbers[highest_position_index]
-            second_number_list = numbers[highest_position_index:]
-            second_number_list.pop(0)
-            print(second_number_list)
-            second_number = max(second_number_list)
-
-            #split array after first instance of highest number
-            # highest number in array after highest number is second number
-        total_joltage += int(f'{first_number}{second_number}')
-        print(f'{first_number}{second_number}')
-        print('--------')
+        total_joltage_list = []
+        cells_taken = 0
+        while len(total_joltage_list) < max_cell_count:
+            result = next_suiteable_number_index_finder(cells, cells_taken, max_cell_count)
+            total_joltage_list.append(result[0])
+            cells = ''.join([str(i) for i in result[1]])
+            cells_taken += 1
+        total_joltage += int(''.join([str(i) for i in total_joltage_list]))
     return total_joltage
 
-print(joltage_finder(input))
+def next_suiteable_number_index_finder(input: str, cells_taken: int, max_cell_count: int):
+    input = list(input)
+    cells = [int(i) for i in input]
+    to_remove = max_cell_count - (cells_taken+1)
+    max_list = cells[0:len(cells)-to_remove]
+    highest_number = max(max_list)
+    highest_number_index = cells.index(highest_number)
+    leftover_cells = cells[highest_number_index+1:]
+    return [highest_number,leftover_cells]
+
+input_csv = 'day3_input'
+input = (open(input_csv))
+print(joltage_finder_supreme(input,2))
+input = (open(input_csv))
+print(joltage_finder_supreme(input,12))
